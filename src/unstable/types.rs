@@ -1,36 +1,49 @@
-use candid::Nat;
+use candid::{CandidType, Nat};
+use serde::{Deserialize, Serialize};
 
-use crate::unstable::values::CandyValueUnstable;
+use crate::stable::types::Property;
+use crate::unstable::value::CandyValueUnstable;
 
-pub type PropertiesUnstable= Vec<PropertyUnstable>;
+pub type PropertiesUnstable = Vec<PropertyUnstable>;
 
-#[derive(Clone)]
-pub struct PropertyUnstable{
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize, PartialEq)]
+pub struct PropertyUnstable {
     pub name: String,
     pub value: CandyValueUnstable,
     pub immutable: bool,
 }
 
-#[derive(Clone)]
-pub enum Floats{
+impl PropertyUnstable {
+    pub fn stabilize_property(self) -> Property {
+        Property {
+            name: self.name,
+            value: self.value.stabilize_value(),
+            immutable: self.immutable,
+        }
+    }
+}
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize, PartialEq)]
+pub enum Floats {
     Frozen(Box<[f64]>),
     Thawed(Vec<f64>),
 }
 
-#[derive(Clone)]
-pub enum Nats{
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize,  PartialEq)]
+pub enum Nats {
     Frozen(Box<[Nat]>),
     Thawed(Vec<Nat>),
 }
 
-#[derive(Clone)]
-pub enum Array{
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize, PartialEq)]
+pub enum Array {
     Frozen(Box<[CandyValueUnstable]>),
     Thawed(Vec<CandyValueUnstable>),
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Bytes{
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize, PartialEq)]
+pub enum Bytes {
     Frozen(Box<[u8]>),
     Thawed(Vec<u8>),
 }

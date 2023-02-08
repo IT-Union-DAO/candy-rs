@@ -1,6 +1,6 @@
 use candid::Nat;
 
-use crate::stable::values::CandyValue;
+use crate::stable::value::CandyValue;
 
 pub struct Query {
     name: String,

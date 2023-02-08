@@ -1,3 +1,3 @@
-pub mod values;
+pub mod value;
 pub mod requests;
 pub mod types;

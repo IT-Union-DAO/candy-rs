@@ -1,4 +1,4 @@
-use crate::unstable::values::CandyValueUnstable;
+use crate::unstable::value::CandyValueUnstable;
 
 pub struct UpdateUnstable {
     name: String,
