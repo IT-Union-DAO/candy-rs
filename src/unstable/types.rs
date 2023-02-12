@@ -1,4 +1,4 @@
-use candid::{CandidType, Nat};
+use candid::CandidType;
 use serde::{Deserialize, Serialize};
 
 use crate::stable::types::Property;
@@ -29,12 +29,11 @@ pub enum Floats {
     Thawed(Vec<f64>),
 }
 
-#[derive(Clone, Debug, CandidType, Serialize, Deserialize,  PartialEq)]
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize, PartialEq)]
 pub enum Nats {
-    Frozen(Box<[Nat]>),
-    Thawed(Vec<Nat>),
+    Frozen(Box<[u128]>),
+    Thawed(Vec<u128>),
 }
-
 
 #[derive(Clone, Debug, CandidType, Serialize, Deserialize, PartialEq)]
 pub enum Array {

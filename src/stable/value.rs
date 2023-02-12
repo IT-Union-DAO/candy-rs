@@ -107,6 +107,7 @@ impl CandyValue {
             Self::Nat16(val) => val.to_string(),
             Self::Nat32(val) => val.to_string(),
             Self::Nat64(val) => val.to_string(),
+            Self::Nats(val) => val.to_string(),
             Self::Float(val) => val.to_string(),
             Self::Text(val) => val,
             Self::Bool(val) => val.to_string(),

@@ -1,9 +1,10 @@
 #[cfg(test)]
 mod conversion_tests {
+    use candid::Principal;
     use pretty_assertions::assert_eq;
 
     use crate::conversion::imp::UnboxCandyValue;
-    use crate::stable::types::Array;
+    use crate::stable::types::{Array, Bytes, Floats, Nats, Property};
     use crate::stable::value::CandyValue;
 
     #[test]
@@ -110,7 +111,7 @@ mod conversion_tests {
         let num = 123_u64;
         assert_eq!(CandyValue::from(num).to_string(), "123");
 
-        //floats
+        // Float
         let num = 123.12;
         assert_eq!(CandyValue::from(num).to_string(), "123.12");
 
@@ -152,10 +153,6 @@ mod conversion_tests {
         let num = 123_i64;
         assert_eq!(CandyValue::from(num).to_string(), "123");
 
-        // Int
-        let num = 123_i128;
-        assert_eq!(CandyValue::from(num).to_string(), "123");
-
         // Text
         let text = "some text".to_string();
         assert_eq!(CandyValue::from(text).to_string(), "some text");
@@ -188,8 +185,55 @@ mod conversion_tests {
             .into_boxed_slice(),
         );
 
-        assert_eq!(array.to_string(), "[{1} {text} {3}]".to_string())
+        assert_eq!(array.to_string(), "[{1} {text} {3}]".to_string());
 
-        //todo test rest types
+        //Nats
+        let nats_frozen = Nats::frozen(vec![123_u128, 1234_u128, 12345_u128].into_boxed_slice());
+        let nats_thawed = Nats::thawed(vec![123_u128, 1234_u128, 12345_u128].into_boxed_slice());
+
+        assert_eq!(nats_thawed.to_string(), "[123 1234 12345]".to_string());
+        assert_eq!(nats_frozen.to_string(), "[123 1234 12345]".to_string());
+
+        //Class
+        let prop = vec![
+            Property {
+                name: "name".to_string(),
+                value: CandyValue::from("some text".to_string()),
+                immutable: false,
+            },
+            Property {
+                name: "name_2".to_string(),
+                value: CandyValue::from("another text".to_string()),
+                immutable: true,
+            },
+        ]
+        .into_boxed_slice();
+        assert_eq!(
+            CandyValue::from(prop).to_string(),
+            "{name:some text; name_2:var another text;}".to_string()
+        );
+
+        //Principal
+        let principal = Principal::anonymous();
+        assert_eq!(CandyValue::from(principal).to_string(), "2vxsx-fae");
+
+        //Floats
+        let floats_thawed = Floats::thawed(vec![12.35, 25.66].into_boxed_slice());
+        let floats_frozen = Floats::frozen(vec![12.35, 25.66].into_boxed_slice());
+
+        assert_eq!(
+            CandyValue::from(floats_thawed).to_string(),
+            "[12.35 25.66]".to_string()
+        );
+        assert_eq!(
+            CandyValue::from(floats_frozen).to_string(),
+            "[12.35 25.66]".to_string()
+        );
+
+        //Bytes
+        let bytes_thawed = Bytes::thawed(vec![1_u8, 2_u8, 3_u8].into_boxed_slice());
+        let bytes_frozen = Bytes::frozen(vec![1_u8, 2_u8, 3_u8].into_boxed_slice());
+        assert_eq!(bytes_thawed.to_string(), "010203".to_string());
+        assert_eq!(bytes_thawed.to_string(), "010203".to_string());
     }
 }

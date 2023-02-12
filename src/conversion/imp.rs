@@ -29,7 +29,6 @@ trait UnboxCandyValueUnstable: UnboxCandyValue {
     fn to_floats_buffer(self) -> Vec<u8>;
 }
 
-
 macro_rules! to_nat_of_size {
     ($x:tt, $method: ident) => {
         match $x {
@@ -40,18 +39,17 @@ macro_rules! to_nat_of_size {
             Self::Nat64(val) => val.$method(),
             Self::Float(val) => match val {
                 val if val < 0.0 => None,
-                _ => val.round().$method()
+                _ => val.round().$method(),
             },
             Self::Int(val) => val.$method(),
             Self::Int8(val) => val.$method(),
             Self::Int16(val) => val.$method(),
             Self::Int32(val) => val.$method(),
             Self::Int64(val) => val.$method(),
-            _ => None
+            _ => None,
         }
     };
 }
-
 
 macro_rules! to_int_of_size {
     ($x:tt, $method: ident) => {
@@ -67,51 +65,50 @@ macro_rules! to_int_of_size {
             Self::Int16(val) => val.$method(),
             Self::Int32(val) => val.$method(),
             Self::Int64(val) => val.$method(),
-            _ => None
+            _ => None,
         }
     };
 }
 
 impl UnboxCandyValue for CandyValue {
-
     fn to_nat(self) -> Option<u128> {
-        to_nat_of_size!(self,to_u128)
+        to_nat_of_size!(self, to_u128)
     }
 
     fn to_nat8(self) -> Option<u8> {
-        to_nat_of_size!(self,to_u8)
+        to_nat_of_size!(self, to_u8)
     }
 
     fn to_nat16(self) -> Option<u16> {
-        to_nat_of_size!(self,to_u16)
+        to_nat_of_size!(self, to_u16)
     }
 
     fn to_nat32(self) -> Option<u32> {
-        to_nat_of_size!(self,to_u32)
+        to_nat_of_size!(self, to_u32)
     }
 
     fn to_nat64(self) -> Option<u64> {
-        to_nat_of_size!(self,to_u64)
+        to_nat_of_size!(self, to_u64)
     }
 
     fn to_int(self) -> Option<i128> {
-        to_int_of_size!(self,to_i128)
+        to_int_of_size!(self, to_i128)
     }
 
     fn to_int8(self) -> Option<i8> {
-        to_int_of_size!(self,to_i8)
+        to_int_of_size!(self, to_i8)
     }
 
     fn to_int16(self) -> Option<i16> {
-        to_int_of_size!(self,to_i16)
+        to_int_of_size!(self, to_i16)
     }
 
     fn to_int32(self) -> Option<i32> {
-        to_int_of_size!(self,to_i32)
+        to_int_of_size!(self, to_i32)
     }
 
     fn to_int64(self) -> Option<i64> {
-        to_int_of_size!(self,to_i64)
+        to_int_of_size!(self, to_i64)
     }
 
     fn to_float(self) -> Option<f64> {
@@ -127,16 +124,11 @@ impl UnboxCandyValue for CandyValue {
             Self::Int16(val) => val.to_f64(),
             Self::Int32(val) => val.to_f64(),
             Self::Int64(val) => val.to_f64(),
-            _ => None
+            _ => None,
         }
     }
 
     fn to_principal(self) -> Option<Principal> {
         todo!()
     }
-
-
-
-
 }
-
