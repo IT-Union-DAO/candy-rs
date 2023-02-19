@@ -18,7 +18,9 @@ pub trait UnboxCandyValue {
     fn to_int32(self) -> Option<i32>;
     fn to_int64(self) -> Option<i64>;
     fn to_float(self) -> Option<f64>;
+    fn to_bool(self) -> Option<bool>;
     fn to_principal(self) -> Option<Principal>;
+    fn to_blob(self) -> Result<Box<[u8]>, String>;
 }
 
 trait UnboxCandyValueUnstable: UnboxCandyValue {
@@ -128,7 +130,66 @@ impl UnboxCandyValue for CandyValue {
         }
     }
 
+    fn to_bool(self) -> Option<bool> {
+        match self {
+            Self::Bool(val) => Some(val),
+            _ => None,
+        }
+    }
+
     fn to_principal(self) -> Option<Principal> {
-        todo!()
+        match self {
+            Self::Principal(val) => Some(val),
+            _ => None,
+        }
+    }
+
+    fn to_blob(self) -> Result<Box<[u8]>, String> {
+        match self {
+            Self::Blob(val) => Ok(val),
+            Self::Bytes(val) => Ok(val.into()),
+            Self::Text(val) => Ok(val.as_bytes().into()),
+            Self::Float(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Int(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Int8(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Int16(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Int32(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Int64(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Bool(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Nat(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(|v| v.into()),
+            Self::Nat8(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Nat16(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Nat32(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Nat64(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Class(val) => serde_cbor::to_vec(&val)
+                .map_err(|e| e.to_string())
+                .map(Box::from),
+            Self::Principal(val) => Ok(val.as_slice().into()),
+            _ => Err("Can not be converted to blob".to_string()),
+        }
     }
 }

@@ -1,11 +1,12 @@
 #[cfg(test)]
 mod conversion_tests {
     use candid::Principal;
+    use candy::stable::types::Nats;
     use pretty_assertions::assert_eq;
 
-    use crate::conversion::imp::UnboxCandyValue;
-    use crate::stable::types::{Array, Bytes, Floats, Nats, Property};
-    use crate::stable::value::CandyValue;
+    use candy::conversion::imp::UnboxCandyValue;
+    use candy::stable::types::{Array, Bytes, Floats, Property};
+    use candy::stable::value::CandyValue;
 
     #[test]
     fn conversion_to_nat() {
@@ -188,7 +189,7 @@ mod conversion_tests {
         assert_eq!(array.to_string(), "[{1} {text} {3}]".to_string());
 
         //Nats
-        let nats_frozen = Nats::frozen(vec![123_u128, 1234_u128, 12345_u128].into_boxed_slice());
+        let nats_frozen = Nats::frozen(vec![123_u128, 1234_u128, 12345_u128].into());
         let nats_thawed = Nats::thawed(vec![123_u128, 1234_u128, 12345_u128].into_boxed_slice());
 
         assert_eq!(nats_thawed.to_string(), "[123 1234 12345]".to_string());
@@ -218,7 +219,7 @@ mod conversion_tests {
         assert_eq!(CandyValue::from(principal).to_string(), "2vxsx-fae");
 
         //Floats
-        let floats_thawed = Floats::thawed(vec![12.35, 25.66].into_boxed_slice());
+        let floats_thawed = Floats::thawed(vec![12.35, 25.66].into());
         let floats_frozen = Floats::frozen(vec![12.35, 25.66].into_boxed_slice());
 
         assert_eq!(
@@ -231,9 +232,116 @@ mod conversion_tests {
         );
 
         //Bytes
-        let bytes_thawed = Bytes::thawed(vec![1_u8, 2_u8, 3_u8].into_boxed_slice());
+        let bytes_thawed = Bytes::thawed([1_u8, 2_u8, 3_u8].into());
         let bytes_frozen = Bytes::frozen(vec![1_u8, 2_u8, 3_u8].into_boxed_slice());
         assert_eq!(bytes_thawed.to_string(), "010203".to_string());
         assert_eq!(bytes_thawed.to_string(), "010203".to_string());
+    }
+
+    #[test]
+    fn conversion_to_blob() {
+        // Nat
+        let num = 255_u128;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([24, 255])
+        );
+
+        // Nat8
+        let num = 255_u8;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([24, 255])
+        );
+
+        // Nat16
+        let num = 2566_u16;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([25, 10, 6])
+        );
+
+        // Nat32
+        let num = 255_u32;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([24, 255])
+        );
+
+        //Nat64
+        let num = 300_000_u64;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([26, 0, 4, 147, 224])
+        );
+
+        //Int
+        let num = -123_i128;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([56, 122])
+        );
+
+        //Int8
+        let num = -123_i8;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([56, 122])
+        );
+
+        //Int16
+        let num = -123_i16;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([56, 122])
+        );
+
+        //Int32
+        let num = -123_i32;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([56, 122])
+        );
+
+        //Float
+        let num = -123.12;
+        assert_eq!(
+            CandyValue::from(num).to_blob().unwrap(),
+            Box::from([251, 192, 94, 199, 174, 20, 122, 225, 72])
+        );
+
+        //Bytes
+        let bytes_thawed = Bytes::thawed([1_u8, 2_u8, 3_u8].into());
+        let bytes_frozen = Bytes::frozen(vec![1_u8, 2_u8, 3_u8].into_boxed_slice());
+        assert_eq!(
+            CandyValue::from(bytes_thawed).to_blob().unwrap(),
+            Box::from([1, 2, 3])
+        );
+        assert_eq!(
+            CandyValue::from(bytes_frozen).to_blob().unwrap(),
+            Box::from([1, 2, 3])
+        );
+
+        // Text
+        let text = "some text".to_string();
+        assert_eq!(
+            CandyValue::from(text).to_blob().unwrap(),
+            Box::from([115, 111, 109, 101, 32, 116, 101, 120, 116,])
+        );
+
+        let blob = CandyValue::from("some_text".to_string()).to_blob().unwrap();
+        let text = String::from_utf8(blob.into_vec()).unwrap();
+        assert_eq!(text, "some_text".to_string());
+
+        //Principal
+        let principal = Principal::anonymous();
+        let result = CandyValue::from(principal).to_blob();
+        assert_eq!(result.unwrap(), Box::from([4]));
+
+        //Bool
+        let t = true;
+        let f = false;
+        assert_eq!(CandyValue::from(t).to_blob().unwrap(), Box::from([245]));
+        assert_eq!(CandyValue::from(f).to_blob().unwrap(), Box::from([244]))
     }
 }

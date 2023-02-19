@@ -26,7 +26,6 @@ macro_rules! candy_nums_to_string {
                 let mut ret = String::new();
                 ret.push_str("[");
 
-                print!("{:?}", self);
                 ret.push_str(
                     match &self {
                         Self::Frozen(val) => val
@@ -137,6 +136,15 @@ pub enum Bytes {
 }
 
 impl_frozen_thawed!(Box<[u8]> => Bytes);
+
+impl From<Bytes> for Box<[u8]> {
+    fn from(value: Bytes) -> Self {
+        match value {
+            Bytes::Frozen(val) => val,
+            Bytes::Thawed(val) => val,
+        }
+    }
+}
 
 impl ToString for Bytes {
     fn to_string(&self) -> String {
