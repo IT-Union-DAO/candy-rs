@@ -1,15 +1,15 @@
 use candid::Nat;
 
-use crate::stable::value::CandyValue;
+use crate::types::value::CandyValue;
 
 pub struct Query {
     name: String,
-    next: Box<[Query]>,
+    next: Vec<Query>,
 }
 
 pub enum QueryMode {
     All,
-    Some(Box<[Query]>),
+    Some(Vec<Query>),
 }
 
 pub struct Update {
@@ -20,14 +20,14 @@ pub struct Update {
 pub enum UpdateMode {
     Set(CandyValue),
     Lock(CandyValue),
-    Next(Box<[Update]>),
+    Next(Vec<Update>),
 }
 
 pub struct UpdateRequest {
     id: String,
-    update: Box<[Update]>,
+    update: Vec<Update>,
 }
 
 pub type AddressedChunk = (Nat, Nat, CandyValue);
-pub type AddressedChunkArray = Box<[AddressedChunk]>;
+pub type AddressedChunkArray = Vec<AddressedChunk>;
 pub type AddressedChunkBuffer = Vec<AddressedChunk>;

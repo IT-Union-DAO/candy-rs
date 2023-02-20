@@ -1,6 +1,4 @@
-pub use stable::*;
-pub use unstable::*;
+pub use types::*;
 
 pub mod conversion;
-pub mod stable;
-pub mod unstable;
+pub mod types;
