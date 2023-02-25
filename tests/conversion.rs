@@ -2,10 +2,12 @@
 mod conversion_tests {
     use candid::Principal;
     use pretty_assertions::assert_eq;
+    use serde_json::json;
 
     use candy::conversion::imp::UnboxCandyValue;
     use candy::types::types::Property;
     use candy::types::value::CandyValue;
+    use candy::value::ToCandyValue;
 
     #[test]
     fn conversion_to_nat() {
@@ -289,5 +291,38 @@ mod conversion_tests {
         let f = false;
         assert_eq!(CandyValue::from(t).to_blob().unwrap(), vec![245]);
         assert_eq!(CandyValue::from(f).to_blob().unwrap(), vec![244])
+    }
+
+    #[test]
+    fn conversion_to_json() {
+        // Nat
+        assert_eq!(CandyValue::from(123_u128).to_json(), "123");
+        assert_eq!(CandyValue::from(123_u64).to_json(), "123");
+        assert_eq!(CandyValue::from(123_u64).to_json(), "123");
+        assert_eq!(CandyValue::from(123_u32).to_json(), "123");
+        assert_eq!(CandyValue::from(123_u16).to_json(), "123");
+        assert_eq!(CandyValue::from(123_u8).to_json(), "123");
+        assert_eq!(CandyValue::from("text").to_json(), "\"text\"");
+        assert_eq!(CandyValue::from("text").to_json(), "\"text\"");
+        assert_eq!(
+            CandyValue::from(vec![
+                Property {
+                    value: CandyValue::from(123_u8),
+                    name: "test".to_string(),
+                    immutable: true
+                },
+                Property {
+                    value: CandyValue::from(124_u8),
+                    name: "test_2".to_string(),
+                    immutable: false
+                }
+            ])
+            .to_json(),
+            "{\"test\":123,\"test_2\":124}"
+        );
+        assert_eq!(
+            vec![1.to_candy(), 2.to_candy()].to_candy().to_json(),
+            "[1,2]"
+        );
     }
 }

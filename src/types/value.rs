@@ -96,13 +96,13 @@ impl CandyValue {
 
     pub fn stringify_array_of_values(vals: &[CandyValue]) -> String {
         let mut result = String::new();
-        result.push_str("[");
+        result.push('[');
         for value in vals {
             let converted = format!("{{{}}} ", value.clone().to_text());
             result.push_str(&converted);
         }
         let mut trimmed = result.trim_end().to_string();
-        trimmed.push_str("]");
+        trimmed.push(']');
         trimmed
     }
 }
@@ -148,3 +148,41 @@ impl From<&str> for CandyValue {
         CandyValue::Text(value.to_string())
     }
 }
+
+pub trait ToCandyValue {
+    fn to_candy(self) -> CandyValue;
+}
+
+macro_rules! to_candy {
+    ($($t:ty),*) => {
+        $(impl ToCandyValue for $t {
+            #[inline]
+            fn to_candy(self) -> CandyValue {
+                CandyValue::from(self)
+            }
+        })*
+    };
+}
+
+to_candy!(
+    i128,
+    i8,
+    i16,
+    i32,
+    i64,
+    u128,
+    u8,
+    u16,
+    u32,
+    u64,
+    f64,
+    Vec<u128>,
+    Vec<f64>,
+    String,
+    bool,
+    Vec<Property>,
+    Principal,
+    Option<Box<CandyValue>>,
+    Vec<u8>,
+    Vec<CandyValue>
+);

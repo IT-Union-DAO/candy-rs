@@ -20,14 +20,7 @@ pub trait UnboxCandyValue {
     fn to_bool(self) -> Option<bool>;
     fn to_principal(self) -> Option<Principal>;
     fn to_blob(self) -> Result<Vec<u8>, String>;
-}
-
-trait UnboxCandyValueUnstable: UnboxCandyValue {
-    fn to_value_array(self) -> Vec<CandyValue>;
-    fn to_blob(self) -> Vec<u8>;
-    fn to_bytes(self) -> Vec<u8>;
-    fn to_bytes_buffer(self) -> Vec<u8>;
-    fn to_floats_buffer(self) -> Vec<u8>;
+    fn to_json(self) -> String;
 }
 
 macro_rules! to_nat_of_size {
@@ -164,6 +157,26 @@ impl UnboxCandyValue for CandyValue {
             Self::Class(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
             Self::Principal(val) => Ok(val.as_slice().into()),
             _ => Err("Can not be converted to blob".to_string()),
+        }
+    }
+
+    fn to_json(self) -> String {
+        match self {
+            Self::Nat(val) => self.to_text(),
+            Self::Nat8(val) => self.to_text(),
+            Self::Nat16(val) => self.to_text(),
+            Self::Nat32(val) => self.to_text(),
+            Self::Nat64(val) => self.to_text(),
+            Self::Text(val) => serde_json::to_string(&val).unwrap(),
+            Self::Class(val) => Property::props_to_json(&val),
+            Self::Array(val) => format!(
+                "[{}]",
+                val.iter()
+                    .map(|i| i.clone().to_json())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            ),
+            _ => self.to_text(),
         }
     }
 }

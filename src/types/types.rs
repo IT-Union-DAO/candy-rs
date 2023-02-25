@@ -1,56 +1,11 @@
+use crate::conversion::imp::UnboxCandyValue;
 use candid::CandidType;
 use hex::ToHex;
 use serde::{Deserialize, Serialize};
 
 use crate::types::value::CandyValue;
 
-macro_rules! impl_frozen_thawed {
-    ($($t:ty => $v:ident),*) => {
-        $(
-        impl $v {
-             pub fn frozen(vals: $t) -> Self {
-                Self::Frozen(vals)
-             }
-            pub fn thawed(vals: $t) -> Self {
-               Self::Thawed(vals)
-             }
-        })*
-    };
-}
-
-macro_rules! candy_nums_to_string {
-    ( $ lhs: ty) => {
-        impl ToString for $lhs {
-            fn to_string(&self) -> String {
-                let mut ret = String::new();
-                ret.push_str("[");
-
-                ret.push_str(
-                    match &self {
-                        Self::Frozen(val) => val
-                            .iter()
-                            .map(|val| val.to_string())
-                            .collect::<Vec<String>>()
-                            .join(" "),
-                        Self::Thawed(val) => val
-                            .iter()
-                            .map(|val| val.to_string())
-                            .collect::<Vec<String>>()
-                            .join(" "),
-                    }
-                    .as_str(),
-                );
-
-                let _ = ret.trim_end();
-                ret.push_str("]");
-
-                ret
-            }
-        }
-    };
-}
-
-pub type Properties = Box<[Property]>;
+pub type Properties = Vec<Property>;
 
 #[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
 pub struct Property {
@@ -73,6 +28,15 @@ impl Property {
     pub fn stringify_properties(props: &[Property]) -> String {
         let prop_strings: Vec<String> = props.iter().map(|p| p.to_string()).collect();
         format!("{{{}}}", prop_strings.join("").trim_end())
+    }
+
+    fn to_json(self) -> String {
+        format!("\"{}\":{}", self.name, self.value.to_json())
+    }
+
+    pub fn props_to_json(props: &[Property]) -> String {
+        let prop_strings: Vec<String> = props.iter().map(|p| p.clone().to_json()).collect();
+        format!("{{{}}}", prop_strings.join(",").trim_end())
     }
 }
 
