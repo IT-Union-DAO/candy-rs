@@ -1,8 +1,8 @@
-use crate::conversion::imp::UnboxCandyValue;
 use candid::CandidType;
 use hex::ToHex;
 use serde::{Deserialize, Serialize};
 
+use crate::conversion::imp::UnboxCandyValue;
 use crate::types::value::CandyValue;
 
 pub type Properties = Vec<Property>;

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "canisters": {
+    "rust": {
+      "type": "rust",
+      "package": "rust",
+      "candid": "src/rust/rust.did"
+    },
+    "motoko": {
+      "type": "motoko",
+      "main": "src/motoko/Actor.mo"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "vessel sources",
+      "args": ""
+    }
+  }
+}
