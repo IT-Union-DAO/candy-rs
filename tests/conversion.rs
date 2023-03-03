@@ -99,83 +99,83 @@ mod conversion_tests {
     fn conversion_to_string() {
         // Nat
         let num = 12345_u128;
-        assert_eq!(CandyValue::from(num).to_text(), "12345");
+        assert_eq!(CandyValue::from(num).to_string(), "12345");
 
         let num = 123_u8;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = 123_u16;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = 123_u32;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = 123_u64;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         // Float
         let num = 123.12;
-        assert_eq!(CandyValue::from(num).to_text(), "123.12");
+        assert_eq!(CandyValue::from(num).to_string(), "123.12");
 
         let num = 123.868;
-        assert_eq!(CandyValue::from(num).to_text(), "123.868");
+        assert_eq!(CandyValue::from(num).to_string(), "123.868");
 
         let num = -0.001;
-        assert_eq!(CandyValue::from(num).to_text(), "-0.001");
+        assert_eq!(CandyValue::from(num).to_string(), "-0.001");
 
         // Int
         let num = -0.51;
-        assert_eq!(CandyValue::from(num).to_text(), "-0.51");
+        assert_eq!(CandyValue::from(num).to_string(), "-0.51");
 
         let num = 123_i8;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = -123_i16;
-        assert_eq!(CandyValue::from(num).to_text(), "-123");
+        assert_eq!(CandyValue::from(num).to_string(), "-123");
 
         let num = -123_i32;
-        assert_eq!(CandyValue::from(num).to_text(), "-123");
+        assert_eq!(CandyValue::from(num).to_string(), "-123");
 
         let num = -123_i64;
-        assert_eq!(CandyValue::from(num).to_text(), "-123");
+        assert_eq!(CandyValue::from(num).to_string(), "-123");
 
         // Int
         let num = -123_i128;
-        assert_eq!(CandyValue::from(num).to_text(), "-123");
+        assert_eq!(CandyValue::from(num).to_string(), "-123");
 
         let num = 123_i8;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = 123_i16;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = 123_i32;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         let num = 123_i64;
-        assert_eq!(CandyValue::from(num).to_text(), "123");
+        assert_eq!(CandyValue::from(num).to_string(), "123");
 
         // Text
         let text = "some text".to_string();
-        assert_eq!(CandyValue::from(text).to_text(), "some text");
+        assert_eq!(CandyValue::from(text).to_string(), "some text");
 
         // Bool
         let bool_candy = CandyValue::from(true);
         let bool_candy_false = CandyValue::from(false);
-        assert_eq!(bool_candy.to_text(), "true");
-        assert_eq!(bool_candy_false.to_text(), "false");
+        assert_eq!(bool_candy.to_string(), "true");
+        assert_eq!(bool_candy_false.to_string(), "false");
 
         //Option
         let option_candy = CandyValue::from(Some(Box::from(CandyValue::from(123))));
         let option_candy_none = CandyValue::from(None);
-        assert_eq!(option_candy.to_text(), "123");
-        assert_eq!(option_candy_none.to_text(), "null");
+        assert_eq!(option_candy.to_string(), "123");
+        assert_eq!(option_candy_none.to_string(), "null");
 
         //Blob
         let blob_candy = CandyValue::from(vec![1_u8, 2_u8, 3_u8]);
         let blob_candy_2 = CandyValue::from(vec![15_u8]);
-        assert_eq!(blob_candy.to_text(), "010203");
-        assert_eq!(blob_candy_2.to_text(), "0f");
+        assert_eq!(blob_candy.to_string(), "010203");
+        assert_eq!(blob_candy_2.to_string(), "0f");
 
         //Array
         let array = CandyValue::from(vec![
@@ -184,12 +184,12 @@ mod conversion_tests {
             CandyValue::from(3),
         ]);
 
-        assert_eq!(array.to_text(), "[{1} {text} {3}]".to_string());
+        assert_eq!(array.to_string(), "[{1} {text} {3}]".to_string());
 
         //Nats
         let nats = CandyValue::from(vec![123_u128, 1234_u128, 12345_u128]);
 
-        assert_eq!(nats.to_text(), "[123 1234 12345]".to_string());
+        assert_eq!(nats.to_string(), "[123 1234 12345]".to_string());
 
         //Class
         let prop = vec![
@@ -205,19 +205,19 @@ mod conversion_tests {
             },
         ];
         assert_eq!(
-            CandyValue::from(prop).to_text(),
+            CandyValue::from(prop).to_string(),
             "{name:some text; name_2:var another text;}".to_string()
         );
 
         //Principal
         let principal = Principal::anonymous();
-        assert_eq!(CandyValue::from(principal).to_text(), "2vxsx-fae");
+        assert_eq!(CandyValue::from(principal).to_string(), "2vxsx-fae");
 
         //Floats
-        let floats = CandyValue::from(vec![12.35, 25.66]);
+        let floats = vec![12.35, 25.66].to_candy();
 
         assert_eq!(
-            CandyValue::from(floats).to_text(),
+            CandyValue::from(floats).to_string(),
             "[12.35 25.66]".to_string()
         );
     }

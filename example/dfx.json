@@ -3,12 +3,12 @@
   "canisters": {
     "rust": {
       "type": "rust",
-      "package": "rust",
-      "candid": "src/rust/rust.did"
+      "package": "rust_callee",
+      "candid": "src/declarations/rust/rust_callee.did"
     },
     "motoko": {
       "type": "motoko",
-      "main": "src/motoko/Actor.mo"
+      "main": "src/motoko_callee/Actor.mo"
     }
   },
   "defaults": {

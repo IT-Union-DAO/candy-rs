@@ -43,6 +43,35 @@ export const idlFactory = ({ IDL }) => {
       'Class' : IDL.Vec(Property),
     })
   );
-  return IDL.Service({ 'getNat' : IDL.Func([], [CandyValue], ['query']) });
+  return IDL.Service({
+    'getBlob' : IDL.Func([], [CandyValue], ['query']),
+    'getBool' : IDL.Func([], [CandyValue], ['query']),
+    'getClass' : IDL.Func([], [CandyValue], ['query']),
+    'getEmpty' : IDL.Func([], [CandyValue], ['query']),
+    'getFloat' : IDL.Func([], [CandyValue], ['query']),
+    'getFrozenArray' : IDL.Func([], [CandyValue], ['query']),
+    'getFrozenBytes' : IDL.Func([], [CandyValue], ['query']),
+    'getFrozenFloats' : IDL.Func([], [CandyValue], ['query']),
+    'getFrozenNats' : IDL.Func([], [CandyValue], ['query']),
+    'getFrozenText' : IDL.Func([], [CandyValue], ['query']),
+    'getInt' : IDL.Func([], [CandyValue], ['query']),
+    'getInt16' : IDL.Func([], [CandyValue], ['query']),
+    'getInt32' : IDL.Func([], [CandyValue], ['query']),
+    'getInt64' : IDL.Func([], [CandyValue], ['query']),
+    'getInt8' : IDL.Func([], [CandyValue], ['query']),
+    'getNat' : IDL.Func([], [CandyValue], ['query']),
+    'getNat16' : IDL.Func([], [CandyValue], ['query']),
+    'getNat32' : IDL.Func([], [CandyValue], ['query']),
+    'getNat64' : IDL.Func([], [CandyValue], ['query']),
+    'getNat8' : IDL.Func([], [CandyValue], ['query']),
+    'getNullOption' : IDL.Func([], [CandyValue], ['query']),
+    'getOptSome' : IDL.Func([], [CandyValue], ['query']),
+    'getPrincipal' : IDL.Func([], [CandyValue], ['query']),
+    'getText' : IDL.Func([], [CandyValue], ['query']),
+    'getThawedArray' : IDL.Func([], [CandyValue], ['query']),
+    'getThawedBytes' : IDL.Func([], [CandyValue], ['query']),
+    'getThawedFloats' : IDL.Func([], [CandyValue], ['query']),
+    'getThawedNats' : IDL.Func([], [CandyValue], ['query']),
+  });
 };
 export const init = ({ IDL }) => { return []; };

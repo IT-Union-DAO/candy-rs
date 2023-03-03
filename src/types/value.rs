@@ -1,8 +1,10 @@
+use std::fmt::Display;
+
 use candid::{CandidType, Principal};
 use hex::ToHex;
 use serde::{Deserialize, Serialize};
 
-use crate::types::types::Property;
+use crate::types::types::{Array, Floats, Nats, Property};
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Clone)]
 pub enum CandyValue {
@@ -23,82 +25,105 @@ pub enum CandyValue {
     Class(Vec<Property>),
     Principal(Principal),
     Option(Option<Box<CandyValue>>),
-    Array(Vec<CandyValue>),
-    Nats(Vec<u128>),
-    Floats(Vec<f64>),
+    Array(Array),
+    Nats(Nats),
+    Floats(Floats),
     Empty,
 }
 
-trait ToText {
-    fn to_text(self) -> String;
-}
-macro_rules! candy_nums_to_text {
-    ($ lhs : ty) => {
-        impl ToText for $lhs {
-            fn to_text(self) -> String {
+impl Display for CandyValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Int(val) => write!(f, "{}", val),
+            Self::Int8(val) => write!(f, "{}", val),
+            Self::Int16(val) => write!(f, "{}", val),
+            Self::Int32(val) => write!(f, "{}", val),
+            Self::Int64(val) => write!(f, "{}", val),
+            Self::Nat(val) => write!(f, "{}", val),
+            Self::Nat8(val) => write!(f, "{}", val),
+            Self::Nat16(val) => write!(f, "{}", val),
+            Self::Nat32(val) => write!(f, "{}", val),
+            Self::Nat64(val) => write!(f, "{}", val),
+            Self::Float(val) => write!(f, "{}", val),
+            Self::Text(val) => write!(f, "{}", val),
+            Self::Bool(val) => write!(f, "{}", val),
+            Self::Blob(val) => write!(f, "{}", val.encode_hex::<String>()),
+            Self::Class(val) => write!(f, "{}", Property::stringify_properties(val)),
+            Self::Principal(val) => write!(f, "{}", val.to_string()),
+            Self::Option(val) => write!(
+                f,
+                "{}",
+                val.as_ref()
+                    .map(|val| val.to_string())
+                    .unwrap_or("null".to_string())
+            ),
+            Self::Array(val) => write!(f, "{}", {
+                let vec = match val {
+                    Array::thawed(val) => val,
+                    Array::frozen(val) => val,
+                };
                 let mut ret = String::new();
-                ret.push_str("[");
+                ret.push('[');
                 ret.push_str(
-                    self.iter()
+                    vec.iter()
+                        .map(|val| format!("{{{}}}", val.to_string()))
+                        .collect::<Vec<String>>()
+                        .join(" ")
+                        .as_str(),
+                );
+                let _ = ret.trim_end();
+                ret.push(']');
+
+                ret
+            }),
+            Self::Nats(val) => write!(f, "{}", {
+                let vec = match val {
+                    Nats::thawed(val) => val,
+                    Nats::frozen(val) => val,
+                };
+                let mut ret = String::new();
+                ret.push('[');
+                ret.push_str(
+                    vec.iter()
                         .map(|val| val.to_string())
                         .collect::<Vec<String>>()
                         .join(" ")
                         .as_str(),
                 );
                 let _ = ret.trim_end();
-                ret.push_str("]");
-
+                ret.push(']');
                 ret
-            }
-        }
-    };
-}
-
-candy_nums_to_text!(Vec<u128>);
-candy_nums_to_text!(Vec<f64>);
-
-impl CandyValue {
-    pub fn to_text(self) -> String {
-        match self {
-            Self::Int(val) => val.to_string(),
-            Self::Int8(val) => val.to_string(),
-            Self::Int16(val) => val.to_string(),
-            Self::Int32(val) => val.to_string(),
-            Self::Int64(val) => val.to_string(),
-            Self::Nat(val) => val.to_string(),
-            Self::Nat8(val) => val.to_string(),
-            Self::Nat16(val) => val.to_string(),
-            Self::Nat32(val) => val.to_string(),
-            Self::Nat64(val) => val.to_string(),
-            Self::Nats(val) => val.to_text(),
-            Self::Float(val) => val.to_string(),
-            Self::Text(val) => val,
-            Self::Bool(val) => val.to_string(),
-            Self::Option(val) => val.map(|val| val.to_text()).unwrap_or("null".to_string()),
-            Self::Blob(val) => val.encode_hex::<String>(),
-            Self::Class(val) => Property::stringify_properties(val.as_ref()),
-            Self::Principal(val) => val.to_string(),
-            Self::Array(val) => {
+            }),
+            Self::Floats(val) => write!(f, "{}", {
+                let vec = match val {
+                    Floats::thawed(val) => val,
+                    Floats::frozen(val) => val,
+                };
                 let mut ret = String::new();
                 ret.push('[');
-                for value in val {
-                    let converted = format!("{{{}}} ", value.clone().to_text());
-                    ret.push_str(&converted)
-                }
-                let mut trimmed = ret.trim_end().to_string();
-                trimmed.push(']');
-                trimmed
-            }
-            Self::Floats(val) => val.to_text(),
-            _ => panic!("Type can not be converted to String!"),
+                ret.push_str(
+                    vec.iter()
+                        .map(|val| val.to_string())
+                        .collect::<Vec<String>>()
+                        .join(" ")
+                        .as_str(),
+                );
+                let _ = ret.trim_end();
+                ret.push(']');
+
+                ret
+            }),
+            Self::Empty => write!(f, ""),
         }
     }
+}
 
+impl CandyValue {
     pub fn stringify_array_of_values(vals: &[CandyValue]) -> String {
         let mut result = String::new();
         result.push('[');
         for value in vals {
-            let converted = format!("{{{}}} ", value.clone().to_text());
+            let converted = format!("{{{}}} ", value.clone().to_string());
             result.push_str(&converted);
         }
         let mut trimmed = result.trim_end().to_string();
@@ -128,9 +153,7 @@ impl_from!(
     u16 => Nat16,
     u32 => Nat32,
     u64 => Nat64,
-    f64 => Float,
-    Vec<u128> => Nats,
-    Vec<f64> => Floats
+    f64 => Float
 );
 
 impl_from!(
@@ -139,13 +162,30 @@ impl_from!(
     Vec<Property> => Class,
     Principal => Principal ,
     Option<Box<CandyValue>> => Option,
-    Vec<u8> => Blob,
-    Vec<CandyValue> => Array
+    Vec<u8> => Blob
 );
 
 impl From<&str> for CandyValue {
     fn from(value: &str) -> Self {
         CandyValue::Text(value.to_string())
+    }
+}
+
+impl From<Vec<CandyValue>> for CandyValue {
+    fn from(value: Vec<CandyValue>) -> Self {
+        CandyValue::Array(Array::frozen(value))
+    }
+}
+
+impl From<Vec<u128>> for CandyValue {
+    fn from(value: Vec<u128>) -> Self {
+        CandyValue::Nats(Nats::frozen(value))
+    }
+}
+
+impl From<Vec<f64>> for CandyValue {
+    fn from(value: Vec<f64>) -> Self {
+        CandyValue::Floats(Floats::frozen(value))
     }
 }
 

@@ -2,7 +2,7 @@ use candid::Principal;
 use hex::ToHex;
 use num_traits::cast::ToPrimitive;
 
-use crate::types::types::Property;
+use crate::types::types::{Array, Property};
 use crate::types::value::CandyValue;
 
 pub trait UnboxCandyValue {
@@ -162,21 +162,27 @@ impl UnboxCandyValue for CandyValue {
 
     fn to_json(self) -> String {
         match self {
-            Self::Nat(val) => self.to_text(),
-            Self::Nat8(val) => self.to_text(),
-            Self::Nat16(val) => self.to_text(),
-            Self::Nat32(val) => self.to_text(),
-            Self::Nat64(val) => self.to_text(),
+            Self::Nat(val) => self.to_string(),
+            Self::Nat8(val) => self.to_string(),
+            Self::Nat16(val) => self.to_string(),
+            Self::Nat32(val) => self.to_string(),
+            Self::Nat64(val) => self.to_string(),
             Self::Text(val) => serde_json::to_string(&val).unwrap(),
             Self::Class(val) => Property::props_to_json(&val),
-            Self::Array(val) => format!(
-                "[{}]",
-                val.iter()
-                    .map(|i| i.clone().to_json())
-                    .collect::<Vec<_>>()
-                    .join(",")
-            ),
-            _ => self.to_text(),
+            Self::Array(val) => {
+                let val = match val {
+                    Array::thawed(val) => val,
+                    Array::frozen(val) => val,
+                };
+                format!(
+                    "[{}]",
+                    val.iter()
+                        .map(|i| i.clone().to_json())
+                        .collect::<Vec<_>>()
+                        .join(",")
+                )
+            }
+            _ => self.to_string(),
         }
     }
 }

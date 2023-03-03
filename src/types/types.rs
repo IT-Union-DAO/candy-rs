@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::conversion::imp::UnboxCandyValue;
 use crate::types::value::CandyValue;
-
 pub type Properties = Vec<Property>;
 
 #[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
@@ -20,7 +19,7 @@ impl ToString for Property {
             true => "var ".to_string(),
             false => "".to_string(),
         };
-        format!("{}:{}{}; ", self.name, desc, self.value.clone().to_text())
+        format!("{}:{}{}; ", self.name, desc, self.value.clone().to_string())
     }
 }
 
@@ -47,4 +46,25 @@ pub enum PropertyError {
     InvalidRequest,
     AuthorizedPrincipalLimitReached(u128),
     Immutable,
+}
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
+#[allow(non_camel_case_types)]
+pub enum Array {
+    frozen(Vec<CandyValue>),
+    thawed(Vec<CandyValue>),
+}
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
+#[allow(non_camel_case_types)]
+pub enum Nats {
+    frozen(Vec<u128>),
+    thawed(Vec<u128>),
+}
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
+#[allow(non_camel_case_types)]
+pub enum Floats {
+    frozen(Vec<f64>),
+    thawed(Vec<f64>),
 }

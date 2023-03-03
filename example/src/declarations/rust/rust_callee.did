@@ -1,3 +1,4 @@
+type Array = variant { thawed : vec CandyValue; frozen : vec CandyValue };
 type CandyValue = variant {
   Int : int;
   Nat : nat;
@@ -9,20 +10,22 @@ type CandyValue = variant {
   Bool : bool;
   Int8 : int8;
   Nat8 : nat8;
-  Nats : vec nat;
+  Nats : Nats;
   Text : text;
   Int16 : int16;
   Int32 : int32;
   Int64 : int64;
   Option : opt CandyValue;
-  Floats : vec float64;
+  Floats : Floats;
   Float : float64;
   Principal : principal;
-  Array : vec CandyValue;
+  Array : Array;
   Class : vec Property;
 };
+type Floats = variant { thawed : vec float64; frozen : vec float64 };
+type Nats = variant { thawed : vec nat; frozen : vec nat };
 type Property = record { value : CandyValue; name : text; immutable : bool };
 service : {
-  candy : (text) -> (CandyValue) query;
-  greet : (text) -> (text) query;
+  get_blob : () -> (CandyValue) query;
+  get_bool : () -> (CandyValue) query;
 }
