@@ -4,7 +4,7 @@ use candid::{CandidType, Principal};
 use hex::ToHex;
 use serde::{Deserialize, Serialize};
 
-use crate::types::types::{Array, Floats, Nats, Property};
+use crate::types::types::{Array, Bytes, Floats, Nats, Property};
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Clone)]
 pub enum CandyValue {
@@ -22,6 +22,7 @@ pub enum CandyValue {
     Text(String),
     Bool(bool),
     Blob(Vec<u8>),
+    Bytes(Bytes),
     Class(Vec<Property>),
     Principal(Principal),
     Option(Option<Box<CandyValue>>),
@@ -48,6 +49,13 @@ impl Display for CandyValue {
             Self::Text(val) => write!(f, "{}", val),
             Self::Bool(val) => write!(f, "{}", val),
             Self::Blob(val) => write!(f, "{}", val.encode_hex::<String>()),
+            Self::Bytes(val) => {
+                let value = match val {
+                    Bytes::thawed(val) => val,
+                    Bytes::frozen(val) => val,
+                };
+                write!(f, "{}", value.encode_hex::<String>())
+            }
             Self::Class(val) => write!(f, "{}", Property::stringify_properties(val)),
             Self::Principal(val) => write!(f, "{}", val.to_string()),
             Self::Option(val) => write!(
@@ -189,6 +197,12 @@ impl From<Vec<f64>> for CandyValue {
     }
 }
 
+impl From<Bytes> for CandyValue {
+    fn from(value: Bytes) -> Self {
+        Self::Bytes(value)
+    }
+}
+
 pub trait ToCandyValue {
     fn to_candy(self) -> CandyValue;
 }
@@ -224,5 +238,6 @@ to_candy!(
     Principal,
     Option<Box<CandyValue>>,
     Vec<u8>,
-    Vec<CandyValue>
+    Vec<CandyValue>,
+    Bytes
 );

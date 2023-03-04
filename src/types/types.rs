@@ -68,3 +68,16 @@ pub enum Floats {
     frozen(Vec<f64>),
     thawed(Vec<f64>),
 }
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
+#[allow(non_camel_case_types)]
+pub enum Bytes {
+    frozen(Vec<u8>),
+    thawed(Vec<u8>),
+}
+
+impl From<Vec<u8>> for Bytes {
+    fn from(bytes: Vec<u8>) -> Self {
+        Bytes::frozen(bytes)
+    }
+}

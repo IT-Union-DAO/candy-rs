@@ -5,7 +5,7 @@ mod conversion_tests {
     use serde_json::json;
 
     use candy::conversion::imp::UnboxCandyValue;
-    use candy::types::types::Property;
+    use candy::types::types::{Bytes, Floats, Nats, Property};
     use candy::types::value::CandyValue;
     use candy::value::ToCandyValue;
 
@@ -177,6 +177,12 @@ mod conversion_tests {
         assert_eq!(blob_candy.to_string(), "010203");
         assert_eq!(blob_candy_2.to_string(), "0f");
 
+        //Bytes
+        let bytes_frozen = Bytes::from(vec![1_u8, 2_u8, 3_u8]).to_candy();
+        let bytes_thawed = Bytes::thawed(vec![15_u8]).to_candy();
+        assert_eq!(bytes_frozen.to_string(), "010203");
+        assert_eq!(bytes_thawed.to_string(), "0f");
+
         //Array
         let array = CandyValue::from(vec![
             CandyValue::from(1),
@@ -277,9 +283,16 @@ mod conversion_tests {
             vec![115, 111, 109, 101, 32, 116, 101, 120, 116,]
         );
 
+        //Blob
         let blob = CandyValue::from("some_text".to_string()).to_blob().unwrap();
         let text = String::from_utf8(blob).unwrap();
         assert_eq!(text, "some_text".to_string());
+
+        //Bytes
+        let bytes_frozen = Bytes::from(vec![1_u8, 2_u8, 3_u8]).to_candy();
+        let bytes_thawed = Bytes::thawed(vec![1_u8, 2_u8, 3_u8]).to_candy();
+        assert_eq!(bytes_frozen.to_blob().unwrap(), vec![1_u8, 2_u8, 3_u8]);
+        assert_eq!(bytes_thawed.to_blob().unwrap(), vec![1_u8, 2_u8, 3_u8]);
 
         //Principal
         let principal = Principal::anonymous();
@@ -324,5 +337,73 @@ mod conversion_tests {
             vec![1.to_candy(), 2.to_candy()].to_candy().to_json(),
             "[1,2]"
         );
+
+        assert_eq!(
+            Some(Box::from(123_u128.to_candy())).to_candy().to_json(),
+            "123"
+        );
+        assert_eq!(CandyValue::from(None).to_json(), "null");
+
+        assert_eq!(
+            candid::Principal::management_canister()
+                .to_candy()
+                .to_json(),
+            "\"aaaaa-aa\""
+        );
+
+        let nats_frozen = vec![123_u128, 1234_u128, 12345_u128].to_candy();
+        let nats_thawed = CandyValue::Nats(Nats::thawed(vec![123_u128, 1234_u128, 12345_u128]));
+        assert_eq!(nats_frozen.to_json(), "[123,1234,12345]");
+        assert_eq!(nats_thawed.to_json(), "[123,1234,12345]");
+
+        //Floats
+        let floats_frozen = vec![12.35, 25.66].to_candy();
+        let floats_thawed = CandyValue::Floats(Floats::thawed(vec![12.35, 25.66]));
+        assert_eq!(floats_frozen.to_json(), "[12.35,25.66]");
+        assert_eq!(floats_thawed.to_json(), "[12.35,25.66]");
+
+        //Bytes
+        let bytes_frozen = Bytes::from(vec![1_u8, 2_u8, 3_u8]).to_candy();
+        let bytes_thawed = Bytes::thawed(vec![15_u8]).to_candy();
+        assert_eq!(bytes_frozen.to_json(), "\"010203\"");
+        assert_eq!(bytes_thawed.to_json(), "\"0f\"");
+
+        //Blob
+        let blob = CandyValue::from(vec![1_u8, 2_u8, 3_u8]);
+        assert_eq!(blob.to_json(), "\"010203\"");
+
+        //Principal
+        let principal = Principal::anonymous();
+        let result = CandyValue::from(principal).to_json();
+        assert_eq!(result, "\"2vxsx-fae\"");
+
+        //Bool
+        let t = true.to_candy();
+        let f = false.to_candy();
+        assert_eq!(t.to_json(), "\"true\"");
+        assert_eq!(f.to_json(), "\"false\"");
+
+        //Float
+        let f = 12.35.to_candy();
+        assert_eq!(f.to_json(), "12.35");
+
+        //Empty
+        assert_eq!(CandyValue::Empty.to_json(), "null");
+
+        //Int
+        let num = 123_i128.to_candy();
+        assert_eq!(num.to_json(), "123");
+        //Int64
+        let num = 123_i64.to_candy();
+        assert_eq!(num.to_json(), "123");
+        //Int32
+        let num = 123_i32.to_candy();
+        assert_eq!(num.to_json(), "123");
+        //Int16
+        let num = 123_i16.to_candy();
+        assert_eq!(num.to_json(), "123");
+        //Int8
+        let num = 123_i8.to_candy();
+        assert_eq!(num.to_json(), "123");
     }
 }

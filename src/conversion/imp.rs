@@ -1,9 +1,11 @@
 use candid::Principal;
 use hex::ToHex;
 use num_traits::cast::ToPrimitive;
+use std::fmt::format;
 
-use crate::types::types::{Array, Property};
+use crate::types::types::{Array, Bytes, Floats, Nats, Property};
 use crate::types::value::CandyValue;
+use crate::value::ToCandyValue;
 
 pub trait UnboxCandyValue {
     fn to_nat(self) -> Option<u128>;
@@ -20,6 +22,7 @@ pub trait UnboxCandyValue {
     fn to_bool(self) -> Option<bool>;
     fn to_principal(self) -> Option<Principal>;
     fn to_blob(self) -> Result<Vec<u8>, String>;
+    fn to_value_array(self) -> Option<Vec<CandyValue>>;
     fn to_json(self) -> String;
 }
 
@@ -139,6 +142,10 @@ impl UnboxCandyValue for CandyValue {
     fn to_blob(self) -> Result<Vec<u8>, String> {
         match self {
             Self::Blob(val) => Ok(val),
+            Self::Bytes(val) => match val {
+                Bytes::thawed(val) => Ok(val),
+                Bytes::frozen(val) => Ok(val),
+            },
             Self::Text(val) => Ok(val.as_bytes().into()),
             Self::Float(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
             Self::Int(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
@@ -162,11 +169,17 @@ impl UnboxCandyValue for CandyValue {
 
     fn to_json(self) -> String {
         match self {
-            Self::Nat(val) => self.to_string(),
-            Self::Nat8(val) => self.to_string(),
-            Self::Nat16(val) => self.to_string(),
-            Self::Nat32(val) => self.to_string(),
-            Self::Nat64(val) => self.to_string(),
+            Self::Nat(val) => val.to_string(),
+            Self::Nat8(val) => val.to_string(),
+            Self::Nat16(val) => val.to_string(),
+            Self::Nat32(val) => val.to_string(),
+            Self::Nat64(val) => val.to_string(),
+            Self::Int(val) => val.to_string(),
+            Self::Int8(val) => val.to_string(),
+            Self::Int16(val) => val.to_string(),
+            Self::Int32(val) => val.to_string(),
+            Self::Int64(val) => val.to_string(),
+            Self::Float(val) => val.to_string(),
             Self::Text(val) => serde_json::to_string(&val).unwrap(),
             Self::Class(val) => Property::props_to_json(&val),
             Self::Array(val) => {
@@ -178,11 +191,56 @@ impl UnboxCandyValue for CandyValue {
                     "[{}]",
                     val.iter()
                         .map(|i| i.clone().to_json())
-                        .collect::<Vec<_>>()
+                        .collect::<Vec<String>>()
                         .join(",")
                 )
             }
-            _ => self.to_string(),
+            Self::Option(val) => match val {
+                Some(val) => val.to_json(),
+                None => "null".to_string(),
+            },
+            Self::Nats(val) => {
+                let val = match val {
+                    Nats::thawed(val) => val,
+                    Nats::frozen(val) => val,
+                };
+                format!(
+                    "[{}]",
+                    val.iter()
+                        .map(|i| i.to_string())
+                        .collect::<Vec<String>>()
+                        .join(",")
+                )
+            }
+            Self::Floats(val) => {
+                let val = match val {
+                    Floats::thawed(val) => val,
+                    Floats::frozen(val) => val,
+                };
+                format!(
+                    "[{}]",
+                    val.iter()
+                        .map(|i| i.to_string())
+                        .collect::<Vec<String>>()
+                        .join(",")
+                )
+            }
+            Self::Bytes(val) => format!("\"{}\"", val.to_candy().to_string()),
+            Self::Blob(val) => format!("\"{}\"", val.encode_hex::<String>()),
+            Self::Principal(val) => format!("\"{}\"", val.to_string()),
+            Self::Bool(val) => format!("\"{}\"", val),
+            Self::Empty => "null".to_string(),
+            _ => "".to_string(),
+        }
+    }
+
+    fn to_value_array(self) -> Option<Vec<CandyValue>> {
+        match self {
+            Self::Array(val) => match val {
+                Array::thawed(val) => Some(val),
+                Array::frozen(val) => Some(val),
+            },
+            _ => None,
         }
     }
 }
