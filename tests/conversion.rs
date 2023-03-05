@@ -2,11 +2,9 @@
 mod conversion_tests {
     use candid::Principal;
     use pretty_assertions::assert_eq;
-    use serde_json::json;
 
-    use candy::conversion::imp::UnboxCandyValue;
-    use candy::types::types::{Bytes, Floats, Nats, Property};
-    use candy::types::value::CandyValue;
+    use candy::types::{Bytes, Floats, Nats, Property};
+    use candy::value::CandyValue;
     use candy::value::ToCandyValue;
 
     #[test]

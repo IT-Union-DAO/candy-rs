@@ -1,6 +1,4 @@
-use candid::Nat;
-
-use crate::types::value::CandyValue;
+use crate::value::CandyValue;
 
 pub struct Query {
     name: String,
@@ -27,7 +25,3 @@ pub struct UpdateRequest {
     id: String,
     update: Vec<Update>,
 }
-
-pub type AddressedChunk = (Nat, Nat, CandyValue);
-pub type AddressedChunkArray = Vec<AddressedChunk>;
-pub type AddressedChunkBuffer = Vec<AddressedChunk>;
