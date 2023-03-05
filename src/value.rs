@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::ops::Add;
 
 use crate::types::{Array, Bytes, Floats, Nats, Property};
 use candid::{CandidType, Principal};
@@ -239,31 +240,37 @@ impl CandyValue {
         }
     }
 
-    pub fn to_blob(self) -> Result<Vec<u8>, String> {
-        match self {
+    pub fn to_blob(self) -> Vec<u8> {
+        let value = match self {
             Self::Blob(val) => Ok(val),
             Self::Bytes(val) => match val {
                 Bytes::thawed(val) => Ok(val),
                 Bytes::frozen(val) => Ok(val),
             },
             Self::Text(val) => Ok(val.as_bytes().into()),
-            Self::Float(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Int(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Int8(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Int16(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Int32(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Int64(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Bool(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Nat(val) => serde_cbor::to_vec(&val)
-                .map_err(|e| e.to_string())
-                .map(|v| v.into()),
-            Self::Nat8(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Nat16(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Nat32(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Nat64(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
-            Self::Class(val) => serde_cbor::to_vec(&val).map_err(|e| e.to_string()),
+            Self::Float(val) => serde_cbor::to_vec(&val),
+            Self::Int(val) => serde_cbor::to_vec(&val),
+            Self::Int8(val) => serde_cbor::to_vec(&val),
+            Self::Int16(val) => serde_cbor::to_vec(&val),
+            Self::Int32(val) => serde_cbor::to_vec(&val),
+            Self::Int64(val) => serde_cbor::to_vec(&val),
+            Self::Bool(val) => serde_cbor::to_vec(&val),
+            Self::Nat(val) => serde_cbor::to_vec(&val),
+            Self::Nat8(val) => serde_cbor::to_vec(&val),
+            Self::Nat16(val) => serde_cbor::to_vec(&val),
+            Self::Nat32(val) => serde_cbor::to_vec(&val),
+            Self::Nat64(val) => serde_cbor::to_vec(&val),
+            Self::Class(val) => serde_cbor::to_vec(&val),
             Self::Principal(val) => Ok(val.as_slice().into()),
-            _ => Err("Can not be converted to blob".to_string()),
+            Self::Array(val) => serde_cbor::to_vec(&val),
+            Self::Option(val) => serde_cbor::to_vec(&val),
+            Self::Nats(val) => serde_cbor::to_vec(&val),
+            Self::Floats(val) => serde_cbor::to_vec(&val),
+            _ => ic_cdk::trap("Empty type cannot be serialized"),
+        };
+        match value {
+            Ok(val) => val,
+            Err(e) => ic_cdk::trap(&e.to_string()),
         }
     }
 
@@ -341,6 +348,55 @@ impl CandyValue {
                 Array::frozen(val) => Some(val),
             },
             _ => None,
+        }
+    }
+
+    //TODO: verify implementation is appropriate
+    pub fn get_value_size(&self) -> u128 {
+        match self {
+            Self::Nat(val) => std::mem::size_of_val(val) as u128,
+            Self::Nat8(val) => std::mem::size_of_val(val) as u128,
+            Self::Nat16(val) => std::mem::size_of_val(val) as u128,
+            Self::Nat32(val) => std::mem::size_of_val(val) as u128,
+            Self::Nat64(val) => std::mem::size_of_val(val) as u128,
+            Self::Int(val) => std::mem::size_of_val(val) as u128,
+            Self::Int8(val) => std::mem::size_of_val(val) as u128,
+            Self::Int16(val) => std::mem::size_of_val(val) as u128,
+            Self::Int32(val) => std::mem::size_of_val(val) as u128,
+            Self::Int64(val) => std::mem::size_of_val(val) as u128,
+            Self::Float(val) => std::mem::size_of_val(val) as u128,
+            Self::Text(val) => std::mem::size_of_val(val) as u128,
+            Self::Class(val) => std::mem::size_of_val(val) as u128,
+            Self::Array(val) => match val {
+                Array::thawed(val) => val
+                    .iter()
+                    .map(|i| i.get_value_size())
+                    .fold(0, |acc, x| acc.add(x)),
+                Array::frozen(val) => val
+                    .iter()
+                    .map(|i| i.get_value_size())
+                    .fold(0, |acc, x| acc.add(x)),
+            },
+            Self::Option(val) => match val {
+                Some(val) => val.get_value_size(),
+                None => 0,
+            },
+            Self::Nats(val) => match val {
+                Nats::thawed(val) => std::mem::size_of_val(val) as u128,
+                Nats::frozen(val) => std::mem::size_of_val(val) as u128,
+            },
+            Self::Floats(val) => match val {
+                Floats::thawed(val) => std::mem::size_of_val(val) as u128,
+                Floats::frozen(val) => std::mem::size_of_val(val) as u128,
+            },
+            Self::Bytes(val) => match val {
+                Bytes::thawed(val) => std::mem::size_of_val(val) as u128,
+                Bytes::frozen(val) => std::mem::size_of_val(val) as u128,
+            },
+            Self::Blob(val) => std::mem::size_of_val(val) as u128,
+            Self::Principal(val) => std::mem::size_of_val(val) as u128,
+            Self::Bool(val) => std::mem::size_of_val(val) as u128,
+            Self::Empty => 0,
         }
     }
 

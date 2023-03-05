@@ -161,6 +161,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "hex",
+ "ic-cdk",
  "num-traits",
  "serde",
  "serde_cbor",
@@ -337,9 +338,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "ic-cdk"
-version = "0.7.1"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e5b73294ba9d7b2c01bd677505c7eee8dd48dff9aa663bec0f168a0c6cc5dc8"
+checksum = "774b653cecdd15b6ae0731cce9e655b9cb2489b88458fd80a5b48aace55dfc1d"
 dependencies = [
  "candid",
  "ic-cdk-macros",

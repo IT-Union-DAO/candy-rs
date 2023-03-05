@@ -41,7 +41,7 @@ pub enum PropertyError {
     Unauthorized,
     NotFound,
     InvalidRequest,
-    AuthorizedPrincipalLimitReached(u128),
+    AuthorizedPrincipalLimitReached(candid::Nat),
     Immutable,
 }
 
