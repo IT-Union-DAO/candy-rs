@@ -1,20 +1,23 @@
-use std::fmt::Display;
+use std::fmt::{format, Display};
 use std::ops::Add;
 
-use crate::types::{Array, Bytes, Floats, Nats, Property};
 use candid::{CandidType, Principal};
 use hex::ToHex;
+use num_bigint::{BigInt, BigUint, ToBigInt};
 use num_traits::cast::ToPrimitive;
+use num_traits::Signed;
 use serde::{Deserialize, Serialize};
+
+use crate::types::{Array, Bytes, Floats, Nats, Property};
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Clone)]
 pub enum CandyValue {
-    Int(i128),
+    Int(candid::Int),
     Int8(i8),
     Int16(i16),
     Int32(i32),
     Int64(i64),
-    Nat(u128),
+    Nat(candid::Nat),
     Nat8(u8),
     Nat16(u16),
     Nat32(u32),
@@ -36,12 +39,12 @@ pub enum CandyValue {
 impl Display for CandyValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Int(val) => write!(f, "{}", val),
+            Self::Int(val) => write!(f, "{}", val.0),
             Self::Int8(val) => write!(f, "{}", val),
             Self::Int16(val) => write!(f, "{}", val),
             Self::Int32(val) => write!(f, "{}", val),
             Self::Int64(val) => write!(f, "{}", val),
-            Self::Nat(val) => write!(f, "{}", val),
+            Self::Nat(val) => write!(f, "{}", val.0),
             Self::Nat8(val) => write!(f, "{}", val),
             Self::Nat16(val) => write!(f, "{}", val),
             Self::Nat32(val) => write!(f, "{}", val),
@@ -64,7 +67,7 @@ impl Display for CandyValue {
                 "{}",
                 val.as_ref()
                     .map(|val| val.to_string())
-                    .unwrap_or("null".to_string())
+                    .unwrap_or_else(|| "null".to_string())
             ),
             Self::Array(val) => write!(f, "{}", {
                 let vec = match val {
@@ -130,7 +133,7 @@ impl Display for CandyValue {
 macro_rules! to_nat_of_size {
     ($x:tt, $method: ident) => {
         match $x {
-            Self::Nat(val) => val.$method(),
+            Self::Nat(val) => val.0.$method(),
             Self::Nat8(val) => val.$method(),
             Self::Nat16(val) => val.$method(),
             Self::Nat32(val) => val.$method(),
@@ -139,7 +142,7 @@ macro_rules! to_nat_of_size {
                 val if val < 0.0 => None,
                 _ => val.round().$method(),
             },
-            Self::Int(val) => val.$method(),
+            Self::Int(val) => val.0.$method(),
             Self::Int8(val) => val.$method(),
             Self::Int16(val) => val.$method(),
             Self::Int32(val) => val.$method(),
@@ -152,13 +155,13 @@ macro_rules! to_nat_of_size {
 macro_rules! to_int_of_size {
     ($x:tt, $method: ident) => {
         match $x {
-            Self::Nat(val) => val.$method(),
+            Self::Nat(val) => val.0.$method(),
             Self::Nat8(val) => val.$method(),
             Self::Nat16(val) => val.$method(),
             Self::Nat32(val) => val.$method(),
             Self::Nat64(val) => val.$method(),
             Self::Float(val) => val.round().$method(),
-            Self::Int(val) => val.$method(),
+            Self::Int(val) => val.0.$method(),
             Self::Int8(val) => val.$method(),
             Self::Int16(val) => val.$method(),
             Self::Int32(val) => val.$method(),
@@ -211,13 +214,13 @@ impl CandyValue {
 
     pub fn to_float(self) -> Option<f64> {
         match self {
-            Self::Nat(val) => val.to_f64(),
+            Self::Nat(val) => val.0.to_f64(),
             Self::Nat8(val) => val.to_f64(),
             Self::Nat16(val) => val.to_f64(),
             Self::Nat32(val) => val.to_f64(),
             Self::Nat64(val) => val.to_f64(),
             Self::Float(val) => Some(val),
-            Self::Int(val) => val.to_f64(),
+            Self::Int(val) => val.0.to_f64(),
             Self::Int8(val) => val.to_f64(),
             Self::Int16(val) => val.to_f64(),
             Self::Int32(val) => val.to_f64(),
@@ -241,36 +244,21 @@ impl CandyValue {
     }
 
     pub fn to_blob(self) -> Vec<u8> {
-        let value = match self {
-            Self::Blob(val) => Ok(val),
+        match self {
+            Self::Blob(val) => val,
             Self::Bytes(val) => match val {
-                Bytes::thawed(val) => Ok(val),
-                Bytes::frozen(val) => Ok(val),
+                Bytes::thawed(val) => val,
+                Bytes::frozen(val) => val,
             },
-            Self::Text(val) => Ok(val.as_bytes().into()),
-            Self::Float(val) => serde_cbor::to_vec(&val),
-            Self::Int(val) => serde_cbor::to_vec(&val),
-            Self::Int8(val) => serde_cbor::to_vec(&val),
-            Self::Int16(val) => serde_cbor::to_vec(&val),
-            Self::Int32(val) => serde_cbor::to_vec(&val),
-            Self::Int64(val) => serde_cbor::to_vec(&val),
-            Self::Bool(val) => serde_cbor::to_vec(&val),
-            Self::Nat(val) => serde_cbor::to_vec(&val),
-            Self::Nat8(val) => serde_cbor::to_vec(&val),
-            Self::Nat16(val) => serde_cbor::to_vec(&val),
-            Self::Nat32(val) => serde_cbor::to_vec(&val),
-            Self::Nat64(val) => serde_cbor::to_vec(&val),
-            Self::Class(val) => serde_cbor::to_vec(&val),
-            Self::Principal(val) => Ok(val.as_slice().into()),
-            Self::Array(val) => serde_cbor::to_vec(&val),
-            Self::Option(val) => serde_cbor::to_vec(&val),
-            Self::Nats(val) => serde_cbor::to_vec(&val),
-            Self::Floats(val) => serde_cbor::to_vec(&val),
-            _ => ic_cdk::trap("Empty type cannot be serialized"),
-        };
-        match value {
-            Ok(val) => val,
-            Err(e) => ic_cdk::trap(&e.to_string()),
+            Self::Text(val) => val.as_bytes().into(),
+            Self::Int(val) => val.0.to_blob(),
+            Self::Nat(val) => val.0.to_blob(),
+            Self::Nat8(val) => [val].to_vec(),
+            Self::Nat16(val) => val.to_be_bytes().to_vec(),
+            Self::Nat32(val) => val.to_be_bytes().to_vec(),
+            Self::Nat64(val) => val.to_be_bytes().to_vec(),
+            Self::Principal(val) => val.as_slice().into(),
+            _ => ic_cdk::trap(format!("Cannot convert to blob {}", self).as_str()),
         }
     }
 
@@ -424,12 +412,10 @@ macro_rules! impl_from {
 }
 
 impl_from!(
-    i128 => Int,
     i8 => Int8,
     i16 => Int16,
     i32 => Int32,
     i64 => Int64,
-    u128 => Nat,
     u8 => Nat8,
     u16 => Nat16,
     u32 => Nat32,
@@ -445,6 +431,30 @@ impl_from!(
     Option<Box<CandyValue>> => Option,
     Vec<u8> => Blob
 );
+
+impl From<u128> for CandyValue {
+    fn from(value: u128) -> Self {
+        CandyValue::Nat(candid::Nat::from(value))
+    }
+}
+
+impl From<BigInt> for CandyValue {
+    fn from(value: BigInt) -> Self {
+        CandyValue::Int(candid::Int::from(value))
+    }
+}
+
+impl From<BigUint> for CandyValue {
+    fn from(value: BigUint) -> Self {
+        CandyValue::Nat(candid::Nat::from(value))
+    }
+}
+
+impl From<i128> for CandyValue {
+    fn from(value: i128) -> Self {
+        CandyValue::Int(candid::Int::from(value))
+    }
+}
 
 impl From<&str> for CandyValue {
     fn from(value: &str) -> Self {
@@ -492,6 +502,8 @@ macro_rules! to_candy {
 }
 
 to_candy!(
+    BigInt,
+    BigUint,
     i128,
     i8,
     i16,
@@ -514,3 +526,47 @@ to_candy!(
     Vec<CandyValue>,
     Bytes
 );
+
+//declate const in trait
+pub trait BigNumToBlob {
+    fn to_blob(self) -> Vec<u8>;
+}
+
+impl BigNumToBlob for BigUint {
+    #[inline]
+    fn to_blob(self) -> Vec<u8> {
+        let mut b = self.clone();
+        let mut bytes: Vec<u8> = Vec::new();
+        loop {
+            let a = (b.clone() % BigUint::from(256_u32))
+                .to_u8()
+                .unwrap_or_else(|| ic_cdk::trap("Can not convert BigUint to u8"));
+            b /= BigUint::from(256_u32);
+            bytes.push(a);
+            if b == BigUint::from(0_u32) {
+                break;
+            }
+        }
+        bytes
+    }
+}
+
+impl BigNumToBlob for BigInt {
+    #[inline]
+    fn to_blob(self) -> Vec<u8> {
+        let c = u8::from(self < BigInt::from(0_i32));
+        let mut b = self.abs();
+        let mut bytes: Vec<u8> = vec![c];
+        loop {
+            let a = (b.clone() % BigInt::from(128_i32))
+                .to_u8()
+                .unwrap_or_else(|| ic_cdk::trap("Can not convert BigInt to u8"));
+            b /= BigInt::from(128_i32);
+            bytes.push(a);
+            if b == BigInt::from(0_i32) {
+                break;
+            }
+        }
+        bytes
+    }
+}

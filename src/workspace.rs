@@ -1,5 +1,6 @@
 use crate::types::Bytes;
 use crate::value::CandyValue;
+use num_traits::AsPrimitive;
 use std::ops::Add;
 
 pub type DataChunk = CandyValue;
@@ -64,6 +65,13 @@ impl AddressedChunkArrayTrait for AddressedChunkArray {
     }
 
     fn flatten(self) -> Vec<u8> {
+        // let res: Vec<u8> = Vec::with_capacity(self.len());
+        // for item in self {
+        //     for byte in  {
+        //         res.add(byte);
+        //     }
+        // }
+        // res
         todo!()
     }
 }

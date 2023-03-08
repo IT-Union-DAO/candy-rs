@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod conversion_tests {
-    use candid::Principal;
+    use candid::{Encode, Principal};
+    use num_bigint::{ToBigInt, ToBigUint};
     use pretty_assertions::assert_eq;
 
     use candy::types::{Bytes, Floats, Nats, Property};
@@ -9,6 +10,7 @@ mod conversion_tests {
 
     #[test]
     fn conversion_to_nat() {
+        let nat = candid::Nat::from(123);
         let num = 12345_u128;
         println!("u128 (Nat) conversion - {:?}", num);
         let nat_candy = CandyValue::from(num);
@@ -230,78 +232,53 @@ mod conversion_tests {
     fn conversion_to_blob() {
         // Nat
         let num = 255_u128;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![24, 255]);
+        assert_eq!(num.to_candy().to_blob(), vec![255]);
 
         // Nat8
         let num = 255_u8;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![24, 255]);
+        assert_eq!(CandyValue::from(num).to_blob(), vec![255]);
 
         // Nat16
         let num = 2566_u16;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![25, 10, 6]);
+        assert_eq!(CandyValue::from(num).to_blob(), vec![10, 6]);
 
         // Nat32
         let num = 255_u32;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![24, 255]);
+        assert_eq!(CandyValue::from(num).to_blob(), vec![0, 0, 0, 255]);
 
         //Nat64
         let num = 300_000_u64;
         assert_eq!(
-            CandyValue::from(num).to_blob().unwrap(),
-            vec![26, 0, 4, 147, 224]
+            CandyValue::from(num).to_blob(),
+            vec![0, 0, 0, 0, 0, 4, 147, 224]
         );
 
         //Int
         let num = -123_i128;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![56, 122]);
-
-        //Int8
-        let num = -123_i8;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![56, 122]);
-
-        //Int16
-        let num = -123_i16;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![56, 122]);
-
-        //Int32
-        let num = -123_i32;
-        assert_eq!(CandyValue::from(num).to_blob().unwrap(), vec![56, 122]);
-
-        //Float
-        let num = -123.12;
-        assert_eq!(
-            CandyValue::from(num).to_blob().unwrap(),
-            vec![251, 192, 94, 199, 174, 20, 122, 225, 72]
-        );
+        assert_eq!(CandyValue::from(num).to_blob(), vec![1, 123]);
 
         // Text
         let text = "some text".to_string();
         assert_eq!(
-            CandyValue::from(text).to_blob().unwrap(),
+            CandyValue::from(text).to_blob(),
             vec![115, 111, 109, 101, 32, 116, 101, 120, 116,]
         );
 
         //Blob
-        let blob = CandyValue::from("some_text".to_string()).to_blob().unwrap();
-        let text = String::from_utf8(blob).unwrap();
-        assert_eq!(text, "some_text".to_string());
+        let blob = CandyValue::from("some_text".to_string()).to_blob();
+        let text = String::from_utf8(blob);
+        assert_eq!(text.unwrap(), "some_text".to_string());
 
         //Bytes
         let bytes_frozen = Bytes::from(vec![1_u8, 2_u8, 3_u8]).to_candy();
         let bytes_thawed = Bytes::thawed(vec![1_u8, 2_u8, 3_u8]).to_candy();
-        assert_eq!(bytes_frozen.to_blob().unwrap(), vec![1_u8, 2_u8, 3_u8]);
-        assert_eq!(bytes_thawed.to_blob().unwrap(), vec![1_u8, 2_u8, 3_u8]);
+        assert_eq!(bytes_frozen.to_blob(), vec![1_u8, 2_u8, 3_u8]);
+        assert_eq!(bytes_thawed.to_blob(), vec![1_u8, 2_u8, 3_u8]);
 
         //Principal
         let principal = Principal::anonymous();
         let result = CandyValue::from(principal).to_blob();
-        assert_eq!(result.unwrap(), vec![4]);
-
-        //Bool
-        let t = true;
-        let f = false;
-        assert_eq!(CandyValue::from(t).to_blob().unwrap(), vec![245]);
-        assert_eq!(CandyValue::from(f).to_blob().unwrap(), vec![244])
+        assert_eq!(result, vec![4]);
     }
 
     #[test]

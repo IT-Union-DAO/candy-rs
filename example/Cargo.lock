@@ -162,6 +162,7 @@ dependencies = [
  "candid",
  "hex",
  "ic-cdk",
+ "num-bigint",
  "num-traits",
  "serde",
  "serde_cbor",
