@@ -6,11 +6,31 @@ let
   -- This is where you can add your own packages to the package-set
   additions =
     [
+    { name = "candid"
+          , version = "v1.0.1"
+          , repo = "https://github.com/gekctek/motoko_candid"
+          , dependencies = ["xtendedNumbers", "base"] : List Text
+          },
     { name = "candy",
       repo = "https://github.com/icdevs/candy_library.git",
       version = "v0.1.13",
       dependencies = ["base"]
-    }
+    },
+    { name = "map"
+      , repo = "https://github.com/ZhenyaUsenko/motoko-hash-map"
+      , version = "v7.0.0"
+      , dependencies = [ "base"]
+      },
+      { name = "stablebuffer"
+        , repo = "https://github.com/skilesare/StableBuffer"
+        , version = "v0.2.0"
+        , dependencies = [ "base"]
+        },
+        { name = "xtendedNumbers"
+              , version = "v1.0.2"
+              , repo = "https://github.com/gekctek/motoko_numbers"
+              , dependencies = [] : List Text
+              }
     ] : List Package
 
 let

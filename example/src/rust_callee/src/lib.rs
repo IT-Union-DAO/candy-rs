@@ -1,6 +1,16 @@
 use candid::export_service;
+use candid::CandidType;
 use candy::value::CandyValue;
+use serde::{Deserialize, Serialize};
 pub mod query;
+
+#[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
+pub enum ChunkingType {
+    #[serde(rename = "eof")]
+    Eof,
+    #[serde(rename = "chunk")]
+    Chunk,
+}
 
 #[ic_cdk::query(name = "__get_candid")]
 fn export_candid() -> String {

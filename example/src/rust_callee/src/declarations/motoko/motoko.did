@@ -1,0 +1,73 @@
+type Property = 
+ record {
+   immutable: bool;
+   name: text;
+   value: CandyValue;
+ };
+type CandyValue = 
+ variant {
+   Array: variant {
+            frozen: vec CandyValue;
+            thawed: vec CandyValue;
+          };
+   Blob: blob;
+   Bool: bool;
+   Bytes: variant {
+            frozen: vec nat8;
+            thawed: vec nat8;
+          };
+   Class: vec Property;
+   Empty;
+   Float: float64;
+   Floats: variant {
+             frozen: vec float64;
+             thawed: vec float64;
+           };
+   Int: int;
+   Int16: int16;
+   Int32: int32;
+   Int64: int64;
+   Int8: int8;
+   Nat: nat;
+   Nat16: nat16;
+   Nat32: nat32;
+   Nat64: nat64;
+   Nat8: nat8;
+   Nats: variant {
+           frozen: vec nat;
+           thawed: vec nat;
+         };
+   Option: opt CandyValue;
+   Principal: principal;
+   Text: text;
+ };
+service : {
+  getBlob: () -> (CandyValue) query;
+  getBool: () -> (CandyValue) query;
+  getClass: () -> (CandyValue) query;
+  getEmpty: () -> (CandyValue) query;
+  getFloat: () -> (CandyValue) query;
+  getFrozenArray: () -> (CandyValue) query;
+  getFrozenBytes: () -> (CandyValue) query;
+  getFrozenFloats: () -> (CandyValue) query;
+  getFrozenNats: () -> (CandyValue) query;
+  getFrozenText: () -> (CandyValue) query;
+  getInt: () -> (CandyValue) query;
+  getInt16: () -> (CandyValue) query;
+  getInt32: () -> (CandyValue) query;
+  getInt64: () -> (CandyValue) query;
+  getInt8: () -> (CandyValue) query;
+  getNat: () -> (CandyValue) query;
+  getNat16: () -> (CandyValue) query;
+  getNat32: () -> (CandyValue) query;
+  getNat64: () -> (CandyValue) query;
+  getNat8: () -> (CandyValue) query;
+  getNullOption: () -> (CandyValue) query;
+  getOptSome: () -> (CandyValue) query;
+  getPrincipal: () -> (CandyValue) query;
+  getText: () -> (CandyValue) query;
+  getThawedArray: () -> (CandyValue) query;
+  getThawedBytes: () -> (CandyValue) query;
+  getThawedFloats: () -> (CandyValue) query;
+  getThawedNats: () -> (CandyValue) query;
+}

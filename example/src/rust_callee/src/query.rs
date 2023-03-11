@@ -2,6 +2,8 @@ use candid::{candid_method, Principal};
 use candy::value::CandyValue;
 use candy::value::ToCandyValue;
 use ic_cdk_macros::query;
+
+use crate::ChunkingType;
 // #[query]
 // #[candid_method(query)]
 // pub fn candy(name: String) -> CandyValue {
@@ -14,6 +16,12 @@ use ic_cdk_macros::query;
 #[candid_method(query)]
 pub fn get_blob() -> CandyValue {
     Principal::from_text("aaaa-aa").unwrap().to_candy()
+}
+
+#[query]
+#[candid_method(query)]
+pub fn get_type() -> ChunkingType {
+    ChunkingType::Eof
 }
 
 //Bool

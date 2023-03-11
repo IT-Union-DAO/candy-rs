@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fmt::{format, Display};
 use std::ops::Add;
 
@@ -33,6 +34,7 @@ pub enum CandyValue {
     Array(Array),
     Nats(Nats),
     Floats(Floats),
+    // Map(HashMap<String, CandyValue>),
     Empty,
 }
 
@@ -126,6 +128,7 @@ impl Display for CandyValue {
                 ret
             }),
             Self::Empty => write!(f, ""),
+            // Self::Map(val) => write!(f, "{:?}", val),
         }
     }
 }
@@ -339,30 +342,54 @@ impl CandyValue {
         }
     }
 
-    //TODO: verify implementation is appropriate
     pub fn get_value_size(&self) -> u128 {
         match self {
-            Self::Nat(val) => std::mem::size_of_val(val) as u128,
-            Self::Nat8(val) => std::mem::size_of_val(val) as u128,
-            Self::Nat16(val) => std::mem::size_of_val(val) as u128,
-            Self::Nat32(val) => std::mem::size_of_val(val) as u128,
-            Self::Nat64(val) => std::mem::size_of_val(val) as u128,
-            Self::Int(val) => std::mem::size_of_val(val) as u128,
-            Self::Int8(val) => std::mem::size_of_val(val) as u128,
-            Self::Int16(val) => std::mem::size_of_val(val) as u128,
-            Self::Int32(val) => std::mem::size_of_val(val) as u128,
-            Self::Int64(val) => std::mem::size_of_val(val) as u128,
-            Self::Float(val) => std::mem::size_of_val(val) as u128,
-            Self::Text(val) => std::mem::size_of_val(val) as u128,
-            Self::Class(val) => std::mem::size_of_val(val) as u128,
+            Self::Nat(val) => {
+                let mut a: u128 = 0;
+                let mut b = val.0.clone();
+                loop {
+                    a += 1;
+                    b /= BigUint::from(256_u128);
+                    if b <= BigUint::from(0_u128) {
+                        break;
+                    }
+                }
+                a
+            }
+            Self::Nat8(val) => 1,
+            Self::Nat16(val) => 2,
+            Self::Nat32(val) => 3,
+            Self::Nat64(val) => 4,
+            Self::Int(val) => {
+                let mut a: u128 = 0;
+                let mut b = val.0.abs();
+                loop {
+                    a += 1;
+                    b /= 256;
+                    if b <= BigInt::from(0_u128) {
+                        break;
+                    }
+                }
+                a + 1
+            }
+            Self::Int8(val) => 1,
+            Self::Int16(val) => 2,
+            Self::Int32(val) => 3,
+            Self::Int64(val) => 4,
+            Self::Float(val) => 4,
+            Self::Text(val) => (val.len() as u128) * 4,
+            Self::Class(val) => val
+                .iter()
+                .map(|item| 1 + (item.name.len() as u128 * 4) + item.value.get_value_size())
+                .fold(0, |acc, x| acc.add(x)),
             Self::Array(val) => match val {
                 Array::thawed(val) => val
                     .iter()
-                    .map(|i| i.get_value_size())
+                    .map(|i| 1 + i.get_value_size())
                     .fold(0, |acc, x| acc.add(x)),
                 Array::frozen(val) => val
                     .iter()
-                    .map(|i| i.get_value_size())
+                    .map(|i| 1 + i.get_value_size())
                     .fold(0, |acc, x| acc.add(x)),
             },
             Self::Option(val) => match val {
@@ -374,16 +401,17 @@ impl CandyValue {
                 Nats::frozen(val) => std::mem::size_of_val(val) as u128,
             },
             Self::Floats(val) => match val {
-                Floats::thawed(val) => std::mem::size_of_val(val) as u128,
-                Floats::frozen(val) => std::mem::size_of_val(val) as u128,
+                Floats::thawed(val) => (val.len() as u128) * 4 + 2,
+                Floats::frozen(val) => (val.len() as u128) * 4 + 2,
             },
             Self::Bytes(val) => match val {
-                Bytes::thawed(val) => std::mem::size_of_val(val) as u128,
-                Bytes::frozen(val) => std::mem::size_of_val(val) as u128,
+                Bytes::thawed(val) => (val.len() as u128) + 2,
+                Bytes::frozen(val) => (val.len() as u128) + 2,
             },
-            Self::Blob(val) => std::mem::size_of_val(val) as u128,
-            Self::Principal(val) => std::mem::size_of_val(val) as u128,
-            Self::Bool(val) => std::mem::size_of_val(val) as u128,
+            Self::Blob(val) => val.len() as u128,
+            Self::Principal(val) => val.as_slice().len() as u128,
+            Self::Bool(val) => 1,
+            // Self::Map(val) => 1,
             Self::Empty => 0,
         }
     }

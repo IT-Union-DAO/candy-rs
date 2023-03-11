@@ -2,6 +2,7 @@ import Blob "mo:base/Blob";
 import Prelude "mo:base/Prelude";
 import Principal "mo:base/Principal";
 import CandyTypes "mo:candy/types";
+
 actor MotokoCanister {
 
     //Nat
