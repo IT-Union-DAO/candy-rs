@@ -1,37 +1,37 @@
-# example
+# Example Project
 
-Welcome to your new example project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+This is an example project that demonstrates the usage of the Candy library with Motoko and Rust
+canisters. The project consists of several canisters - `candyFunctions-motoko`, `worskpace-motoko`
+and `rust` -
+that use the Candy library to perform various operations. Basically they contain the same set of
+update and query endpoints. jest tests are set up to check inter canister calls, type compatability
+and candy library functions
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+## Installation
 
-To learn more before you start working with example, see the following documentation available online:
+To install the project, run the `reinstall.sh` script in the root directory:
 
-- [Quick Start](https://smartcontracts.org/docs/quickstart/quickstart-intro.html)
-- [SDK Developer Tools](https://smartcontracts.org/docs/developers-guide/sdk-guide.html)
-- [Rust Canister Devlopment Guide](https://smartcontracts.org/docs/rust-guide/rust-intro.html)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://smartcontracts.org/docs/candid-guide/candid-intro.html)
-- [JavaScript API Reference](https://erxue-5aaaa-aaaab-qaagq-cai.raw.ic0.app)
-
-If you want to start working on your project right away, you might want to try the following commands:
-
-```bash
-cd example/
-dfx help
-dfx canister --help
 ```
-
-## Running the project locally
-
-If you want to test your project locally, you can use the following commands:
-
-```bash
-# Starts the replica, running in the background
 dfx start --background
-
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
+./reinstall.sh
 ```
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+The script will install the necessary dependencies for the Motoko and Rust canisters.
+
+## Usage
+
+To run the Jest tests for the Motoko canister, navigate to the `candy-example-motoko` directory and
+run the following commands:
+
+```
+npm install
+npm test
+```
+
+To run the Rust tests, navigate to the `candy-example-rust` directory and run the following command:
+
+```
+cargo test
+```
+
+Rust tests produce `.did` for rust canister

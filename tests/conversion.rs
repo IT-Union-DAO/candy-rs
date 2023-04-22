@@ -4,10 +4,10 @@ mod conversion_tests {
     use candid::Principal;
     use pretty_assertions::assert_eq;
 
-    use candy::types::PropertyShared;
-    use candy::value::CandyShared::Bytes;
-    use candy::value::ToCandyValue;
-    use candy::value::{CandyShared, ToBlob};
+    use ic_candy::types::PropertyShared;
+    use ic_candy::value::CandyShared::Bytes;
+    use ic_candy::value::ToCandyValue;
+    use ic_candy::value::{CandyShared, ToBlob};
 
     #[test]
     fn conversion_to_nat() {

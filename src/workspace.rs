@@ -4,13 +4,31 @@ use serde::{Deserialize, Serialize};
 
 use crate::value::{CandyShared, ToCandyValue};
 
+/*
+   DataChunk is a type alias of CandyShared that represents a single chunk of data.
+*/
 pub type DataChunk = CandyShared;
+/*
+   DataZone is a type alias of Vec<DataChunk> that represents a contiguous sequence of data.
+*/
 pub type DataZone = Vec<DataChunk>;
+/*
+   Workspace is a type alias of Vec<DataZone> that represents a workspace containing multiple contiguous sequences of data.
+*/
 pub type Workspace = Vec<DataZone>;
 
+/*
+   A tuple consisting of an address, a length, and a CandyShared instance representing a single chunk of data
+*/
 pub type AddressedChunk = (u128, u128, CandyShared);
+/*
+   A vector of AddressedChunk instances representing a contiguous sequence of chunks of data
+*/
 pub type AddressedChunkArray = Vec<AddressedChunk>;
 
+/*
+Enumeration that specifies the type of chunk retrieved from workspace, which can be either Eof (for end-of-file) or Chunk (partial)
+*/
 #[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
 pub enum ChunkingType {
     #[serde(rename = "eof")]
@@ -19,9 +37,24 @@ pub enum ChunkingType {
     Chunk,
 }
 
+/// A trait for operations on `AddressedChunkArray`, which is a vector of `AddressedChunk` instances representing a contiguous sequence of chunks of data.
 pub trait AddressedChunkArrayTrait {
+    /// Get the total size of the `AddressedChunkArray`.
     fn get_addressed_chunk_array_size(&self) -> u128;
+
+    /// Get the data chunk from the specified `DataZone` and `DataChunk`.
+    ///
+    /// # Arguments
+    ///
+    /// * `data_zone` - The index of the `DataZone` containing the desired data chunk.
+    /// * `data_chunk` - The index of the desired data chunk within the specified `DataZone`.
+    ///
+    /// # Returns
+    ///
+    /// The `CandyShared` instance representing the desired data chunk, or a `CandyShared::Option(None)` instance if the data chunk is not found.
     fn get_data_chunk(&self, data_zone: u128, data_chunk: u128) -> CandyShared;
+
+    /// Flatten the `AddressedChunkArray` into a byte vector.
     fn flatten(self) -> Vec<u8>;
 }
 
@@ -31,11 +64,51 @@ pub trait DataZoneTrait {
     fn from_buffer(bytes_buffer: Vec<Vec<u8>>) -> Self;
 }
 
+/// The `WorkspaceTrait` trait provides methods for working with a workspace, which is a vector of `DataZone` instances.
 pub trait WorkspaceTrait {
+    // Counts the total number of addressed chunks in the workspace.
+    ///
+    /// # Returns
+    ///
+    /// * A `u128` representing the count of addressed chunks.
     fn count_addressed_chunks(&self) -> u128;
+    /// Converts the workspace into an `AddressedChunkArray`.
+    ///
+    /// # Returns
+    ///
+    /// * An `AddressedChunkArray` representing the workspace.
     fn to_addressed_chunk_array(self) -> AddressedChunkArray;
+    /// Creates a workspace from an `AddressedChunkArray`.
+    ///
+    /// # Arguments
+    ///
+    /// * `chunks` - An `AddressedChunkArray` representing the workspace.
+    ///
+    /// # Returns
+    ///
+    /// * A `Workspace` instance.
     fn from_addressed_chunks(chunks: AddressedChunkArray) -> Self;
+    /// Gets the number of chunks a workspace will be split into given a max chunk size (bytes).
+    ///
+    /// # Arguments
+    ///
+    /// * `max_chunk_size` - A `u128` representing the maximum chunk size in bytes.
+    ///
+    /// # Returns
+    ///
+    /// * A `u128` representing the number of chunks.
     fn get_workspace_chunk_size(self, max_chunk_size: u128) -> u128;
+
+    /// Gets the chunk at a given index in the workspace.
+    ///
+    /// # Arguments
+    ///
+    /// * `chunk_id` - A `u128` representing the index of the chunk to retrieve.
+    /// * `max_chunk_size` - A `u128` representing the maximum chunk size in bytes.
+    ///
+    /// # Returns
+    ///
+    /// * A tuple containing a `ChunkingType` indicating whether the chunk is a regular chunk or the end-of-file chunk, and an `AddressedChunkArray` representing the chunk.
     fn get_workspace_chunk(
         self,
         chunk_id: u128,
@@ -46,10 +119,10 @@ pub trait WorkspaceTrait {
 impl DataZoneTrait for DataZone {
     ///  Get DataZone size of CandyShared values
     /// ```
-    /// use candy::value::CandyShared;
-    /// use candy::workspace::DataZone;
-    /// use crate::candy::workspace::DataZoneTrait;
-    /// use crate::candy::value::ToCandyValue;
+    /// use ic_candy::value::CandyShared;
+    /// use ic_candy::workspace::DataZone;
+    /// use crate::ic_candy::workspace::DataZoneTrait;
+    /// use crate::ic_candy::value::ToCandyValue;
     /// use candid::Principal;
     ///
     ///
@@ -63,12 +136,26 @@ impl DataZoneTrait for DataZone {
         Encode!(self).unwrap().len() as u128
     }
 
+    /// Convert the DataZone to a vector of byte vectors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ic_candy::value::{CandyShared, ToCandyValue};
+    /// use ic_candy::workspace::DataZone;
+    /// use crate::ic_candy::workspace::DataZoneTrait;
+    ///
+    /// let dz: DataZone = vec![42_u128.to_candy()];
+    /// let buffer = dz.to_bytes_buffer();
+    /// assert_eq!(buffer, vec![vec![42]]);
+    /// ```
     fn to_bytes_buffer(self) -> Vec<Vec<u8>> {
         self.into_iter()
             .map(DataChunk::to_blob)
             .collect::<Vec<Vec<u8>>>()
     }
 
+    /// Convert the DataZone from a vector of byte vectors.
     fn from_buffer(bytes_buffer: Vec<Vec<u8>>) -> Self {
         bytes_buffer.into_iter().map(CandyShared::Bytes).collect()
     }

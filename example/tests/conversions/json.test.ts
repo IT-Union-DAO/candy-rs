@@ -1,5 +1,5 @@
 import { _SERVICE as RustCanister } from "dfx-gen/rust/rust.did";
-import { _SERVICE as MotokoCanister } from "dfx-gen/motoko/motoko.did";
+import { _SERVICE as MotokoCanister } from "dfx-gen/candyFunctions/candyFunctions.did";
 import { createMotokoActor, createRustActor } from "../utils";
 
 describe("CandyShared to JSON conversion:", () => {

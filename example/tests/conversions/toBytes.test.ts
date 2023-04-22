@@ -1,30 +1,6 @@
-import { _SERVICE as RustCanister, CandyShared } from "dfx-gen/rust/rust.did";
-import { _SERVICE as MotokoCanister } from "dfx-gen/motoko/motoko.did";
+import { _SERVICE as RustCanister } from "dfx-gen/rust/rust.did";
+import { _SERVICE as MotokoCanister } from "dfx-gen/candyFunctions/candyFunctions.did";
 import { createMotokoActor, createRustActor } from "../utils";
-import {
-  CandyBlob,
-  CandyBool,
-  CandyBytes,
-  CandyFloat,
-  CandyInt,
-  CandyInt16,
-  CandyInt32,
-  CandyInt64,
-  CandyInt8,
-  CandyInts,
-  CandyMap,
-  CandyNat,
-  CandyNat16,
-  CandyNat32,
-  CandyNat64,
-  CandyNat8,
-  CandyNats,
-  CandyOption,
-  CandySet,
-  CandyText,
-} from "./../types/index";
-
-import canister_ids from "../../.dfx/local/canister_ids.json";
 
 describe("CandyShared to Blob conversion should:", () => {
   let rustCanister: RustCanister;

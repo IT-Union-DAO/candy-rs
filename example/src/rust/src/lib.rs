@@ -3,9 +3,9 @@ use candid::CandidType;
 use ic_cdk::api::call::CallResult;
 use serde::{Deserialize, Serialize};
 
-use candy::value::CandyShared;
-use candy::value::*;
-use candy::workspace::{AddressedChunkArray, ChunkingType};
+use ic_candy::value::CandyShared;
+use ic_candy::value::*;
+use ic_candy::workspace::{AddressedChunkArray, ChunkingType};
 
 pub mod bytes;
 pub mod icc;

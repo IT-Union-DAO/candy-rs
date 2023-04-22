@@ -1,8 +1,8 @@
 use candid::candid_method;
 use candid::Principal;
-use candy::value::CandyShared;
-use candy::value::ToCandyValue;
-use candy::workspace::ChunkingType;
+use ic_candy::value::CandyShared;
+use ic_candy::value::ToCandyValue;
+use ic_candy::workspace::ChunkingType;
 use ic_cdk_macros::{query, update};
 
 #[query]

@@ -12,5 +12,5 @@ crate-type = ["cdylib"]
 candid = "0.8.4"
 ic-cdk = "0.7.1"
 ic-cdk-macros = "0.6.9"
-candy = { path = "../../../../candy" }
+ic_candy = { path = "../../../../candy-rs" }
 serde = "1.0.154"

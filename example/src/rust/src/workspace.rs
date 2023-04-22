@@ -2,8 +2,8 @@ use candid::candid_method;
 use candid::Principal;
 use ic_cdk_macros::{query, update};
 
-use candy::value::{CandyShared, ToCandyValue};
-use candy::workspace::{
+use ic_candy::value::{CandyShared, ToCandyValue};
+use ic_candy::workspace::{
     AddressedChunkArray, AddressedChunkArrayTrait, ChunkingType, DataZone, DataZoneTrait,
     Workspace, WorkspaceTrait,
 };

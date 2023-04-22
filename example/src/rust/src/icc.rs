@@ -1,7 +1,7 @@
 use candid::{candid_method, Principal};
-use candy::value::CandyShared;
-use candy::value::ToCandyValue;
-use candy::workspace::ChunkingType;
+use ic_candy::value::CandyShared;
+use ic_candy::value::ToCandyValue;
+use ic_candy::workspace::ChunkingType;
 use ic_cdk::api::call::CallResult;
 use ic_cdk::call;
 use ic_cdk_macros::{query, update};

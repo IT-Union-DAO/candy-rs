@@ -1,7 +1,14 @@
 [package]
-name = "candy"
+name = "ic_candy"
 version = "0.1.0"
 edition = "2021"
+authors = ["IT-Union DAO", "Andrei Dunai"]
+repository = "https://github.com/IT-Union-DAO/candy-rs"
+license = "MIT"
+readme = "README.md"
+description = "ICP data types wrappers and additional functions"
+keywords = ["icp", "motoko", "dfinity", "canisters", "dfx"]
+include = ["src/", "LICENSE", "README.md"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

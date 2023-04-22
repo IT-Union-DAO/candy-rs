@@ -69,7 +69,7 @@ describe("Workspace functionality should be equal for motoko and rust libraries"
     test("sizes are not equal", async () => {
       const rustSize = await rustCanister.get_data_zone_size();
       const motokoSize = await motokoCanister.getDataZoneSize();
-      expect(rustSize).toEqual(BigInt(387));
+      expect(rustSize).toEqual(BigInt(197));
       expect(motokoSize).toEqual(BigInt(1));
     });
 

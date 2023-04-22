@@ -6,8 +6,8 @@ mod collections_test {
 
     use candid::Principal;
 
-    use candy::types::PropertyShared;
-    use candy::value::{CandyShared, ToCandyValue};
+    use ic_candy::types::PropertyShared;
+    use ic_candy::value::{CandyShared, ToCandyValue};
 
     use super::*;
 
