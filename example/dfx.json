@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "canisters": {
+    "candyFunctions": {
+      "type": "motoko",
+      "main": "src/motoko/candyFunctions.mo"
+    },
+    "workspace": {
+      "type": "motoko",
+      "main": "src/motoko/workspace.mo"
+    },
+    "rust": {
+      "type": "rust",
+      "package": "rust",
+      "candid": "src/rust/rust.did",
+      "dependencies": [
+        "candyFunctions",
+        "workspace"
+      ]
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8005",
+      "type": "ephemeral"
+    }
+  },
+  "defaults": {
+    "replica": {
+      "subnet_type": "system"
+    },
+    "build": {
+      "packtool": "vessel sources",
+      "args": ""
+    }
+  }
+}

@@ -1,0 +1,60 @@
+type PropertyShared = 
+ record {
+   immutable: bool;
+   name: text;
+   value: CandyShared;
+ };
+type CandyShared = 
+ variant {
+   Array: vec CandyShared;
+   Blob: blob;
+   Bool: bool;
+   Bytes: vec nat8;
+   Class: vec PropertyShared;
+   Float: float64;
+   Floats: vec float64;
+   Int: int;
+   Int16: int16;
+   Int32: int32;
+   Int64: int64;
+   Int8: int8;
+   Ints: vec int;
+   Map: vec record {
+              CandyShared;
+              CandyShared;
+            };
+   Nat: nat;
+   Nat16: nat16;
+   Nat32: nat32;
+   Nat64: nat64;
+   Nat8: nat8;
+   Nats: vec nat;
+   Option: opt CandyShared;
+   Principal: principal;
+   Set: vec CandyShared;
+   Text: text;
+ };
+type AddressedChunkArray = vec AddressedChunk;
+type AddressedChunk = 
+ record {
+   nat;
+   nat;
+   CandyShared;
+ };
+service : {
+  countChunks: (AddressedChunkArray) -> (nat);
+  fromBuffer: () -> (vec CandyShared);
+  getChunkArraySize: () -> (nat);
+  getDataChunkFromAddressedChunkArray: (nat, nat) -> (CandyShared);
+  getDataZoneSize: () -> (nat);
+  getFlattenChunkedArray: () -> (vec nat8);
+  getWorkspaceChunk: (AddressedChunkArray, nat, nat) ->
+   (variant {
+      chunk;
+      eof;
+    }, AddressedChunkArray);
+  getWorkspaceChunkSize: (AddressedChunkArray, nat) -> (nat);
+  testChunkArray: () -> (AddressedChunkArray);
+  toBytesBuffer: () -> (vec vec nat8);
+  toWorkspaceAndBack: (AddressedChunkArray) -> (AddressedChunkArray);
+}

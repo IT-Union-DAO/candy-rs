@@ -1,0 +1,112 @@
+type CandyShared = variant {
+  Int : int;
+  Map : vec record { CandyShared; CandyShared };
+  Nat : nat;
+  Set : vec CandyShared;
+  Nat16 : nat16;
+  Nat32 : nat32;
+  Nat64 : nat64;
+  Blob : vec nat8;
+  Bool : bool;
+  Int8 : int8;
+  Ints : vec int;
+  Nat8 : nat8;
+  Nats : vec nat;
+  Text : text;
+  Bytes : vec nat8;
+  Int16 : int16;
+  Int32 : int32;
+  Int64 : int64;
+  Option : opt CandyShared;
+  Floats : vec float64;
+  Float : float64;
+  Principal : principal;
+  Array : vec CandyShared;
+  Class : vec PropertyShared;
+};
+type ChunkingType = variant { eof; chunk };
+type PropertyShared = record {
+  value : CandyShared;
+  name : text;
+  immutable : bool;
+};
+service : {
+  candy_array_to_json : () -> (text) query;
+  candy_blob_to_blob : () -> (vec nat8) query;
+  candy_blob_to_json : () -> (text) query;
+  candy_bool_to_json : () -> (text) query;
+  candy_bytes_to_blob : () -> (vec nat8) query;
+  candy_bytes_to_json : () -> (text) query;
+  candy_class_to_json : () -> (text) query;
+  candy_float_to_blob : () -> (vec nat8) query;
+  candy_float_to_json : () -> (text) query;
+  candy_floats_to_json : () -> (text) query;
+  candy_int16_to_json : () -> (text) query;
+  candy_int32_to_json : () -> (text) query;
+  candy_int64_to_json : () -> (text) query;
+  candy_int8_to_json : () -> (text) query;
+  candy_int_to_blob : () -> (vec nat8) query;
+  candy_int_to_json : () -> (text) query;
+  candy_ints_to_json : () -> (text) query;
+  candy_nat16_to_blob : () -> (vec nat8) query;
+  candy_nat16_to_json : () -> (text) query;
+  candy_nat32_to_blob : () -> (vec nat8) query;
+  candy_nat32_to_json : () -> (text) query;
+  candy_nat64_to_blob : () -> (vec nat8) query;
+  candy_nat64_to_json : () -> (text) query;
+  candy_nat8_to_blob : () -> (vec nat8) query;
+  candy_nat8_to_json : () -> (text) query;
+  candy_nat_to_blob : () -> (vec nat8) query;
+  candy_nat_to_json : () -> (text) query;
+  candy_nats_to_json : () -> (text) query;
+  candy_option_some_to_json : () -> (text) query;
+  candy_option_to_json : () -> (text) query;
+  candy_principal_to_blob : () -> (vec nat8) query;
+  candy_principal_to_json : () -> (text) query;
+  candy_text_to_blob : () -> (vec nat8) query;
+  candy_text_to_json : () -> (text) query;
+  count_chunks : (vec record { nat; nat; CandyShared }) -> (nat) query;
+  from_buffer : () -> (vec CandyShared) query;
+  get_candy : (text, text) -> (CandyShared);
+  get_chunk_array_size : () -> (nat) query;
+  get_data_chunk_from_addressed_chunk_array : (nat, nat) -> (CandyShared) query;
+  get_data_zone_size : () -> (nat) query;
+  get_flatten_chunk_array : () -> (vec nat8) query;
+  get_workspace_chunk : (vec record { nat; nat; CandyShared }, nat, nat) -> (
+      ChunkingType,
+      vec record { nat; nat; CandyShared },
+    ) query;
+  get_ws_chunk_size : (vec record { nat; nat; CandyShared }, nat) -> (
+      nat,
+    ) query;
+  size_of_candy_array : () -> (nat) query;
+  size_of_candy_blob : () -> (nat) query;
+  size_of_candy_bool : () -> (nat) query;
+  size_of_candy_bytes : () -> (nat) query;
+  size_of_candy_class : () -> (nat) query;
+  size_of_candy_float : () -> (nat) query;
+  size_of_candy_floats : () -> (nat) query;
+  size_of_candy_int : () -> (nat) query;
+  size_of_candy_int16 : () -> (nat) query;
+  size_of_candy_int32 : () -> (nat) query;
+  size_of_candy_int64 : () -> (nat) query;
+  size_of_candy_int8 : () -> (nat) query;
+  size_of_candy_ints : () -> (nat) query;
+  size_of_candy_map : () -> (nat) query;
+  size_of_candy_nat : () -> (nat) query;
+  size_of_candy_nat16 : () -> (nat) query;
+  size_of_candy_nat32 : () -> (nat) query;
+  size_of_candy_nat64 : () -> (nat) query;
+  size_of_candy_nat8 : () -> (nat) query;
+  size_of_candy_nats : () -> (nat) query;
+  size_of_candy_option : () -> (nat) query;
+  size_of_candy_option_none : () -> (nat) query;
+  size_of_candy_principal : () -> (nat) query;
+  size_of_candy_set : () -> (nat) query;
+  size_of_candy_text : () -> (nat) query;
+  test_chunk_array : () -> (vec record { nat; nat; CandyShared }) query;
+  to_bytes_buffer : () -> (vec vec nat8) query;
+  to_workspace_and_back : (vec record { nat; nat; CandyShared }) -> (
+      vec record { nat; nat; CandyShared },
+    ) query;
+}
