@@ -8,7 +8,7 @@ export const idlFactory = ({ IDL }) => {
   CandyShared.fill(
     IDL.Variant({
       'Int' : IDL.Int,
-      'Map' : IDL.Vec(IDL.Tuple(CandyShared, CandyShared)),
+      'Map' : IDL.Vec(IDL.Tuple(IDL.Text, CandyShared)),
       'Nat' : IDL.Nat,
       'Set' : IDL.Vec(CandyShared),
       'Nat16' : IDL.Nat16,
@@ -30,6 +30,7 @@ export const idlFactory = ({ IDL }) => {
       'Float' : IDL.Float64,
       'Principal' : IDL.Principal,
       'Array' : IDL.Vec(CandyShared),
+      'ValueMap' : IDL.Vec(IDL.Tuple(CandyShared, CandyShared)),
       'Class' : IDL.Vec(PropertyShared),
     })
   );

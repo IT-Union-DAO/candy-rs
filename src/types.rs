@@ -49,7 +49,7 @@ pub enum PropertyError {
     Immutable,
 }
 
-#[derive(Clone, Debug, std::cmp::PartialOrd, CandidType, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialOrd, CandidType, Serialize, Deserialize)]
 pub struct Float(f64);
 
 impl PartialEq for Float {

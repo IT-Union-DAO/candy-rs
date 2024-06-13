@@ -11,16 +11,16 @@ import StableBuffer "mo:stablebuffer/StableBuffer";
 actor WorkspacesFunctions {
 
     public func testChunkArray() : async Types.AddressedChunkArray {
-        let ws = Workspace.initWorkspace(3);
+        let ws = Workspace.emptyWorkspace();
 
-        let dz_1 = StableBuffer.initPresized<Types.DataChunk>(2);
+        let dz_1 = StableBuffer.init<Types.DataChunk>();
 
         StableBuffer.add(dz_1, #Nat(16));
         StableBuffer.add(dz_1, #Principal(Principal.fromText("aaaaa-aa")));
 
-        let dz_2 = StableBuffer.initPresized<Types.DataChunk>(2);
-        StableBuffer.add<Types.DataChunk>(dz_2, #Nat(16));
-        StableBuffer.add<Types.DataChunk>(dz_2, #Principal(Principal.fromText("aaaaa-aa")));
+        let dz_2 = StableBuffer.init<Types.DataChunk>();
+        StableBuffer.add<Types.Candy>(dz_2, #Nat(16));
+        StableBuffer.add<Types.Candy>(dz_2, #Principal(Principal.fromText("aaaaa-aa")));
 
         let dz_3 = StableBuffer.initPresized<Types.DataChunk>(2);
         StableBuffer.add<Types.DataChunk>(dz_3, #Int(-123_456_789_000));

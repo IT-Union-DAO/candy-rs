@@ -20,7 +20,7 @@ type CandyShared =
    Int8: int8;
    Ints: vec int;
    Map: vec record {
-              CandyShared;
+              text;
               CandyShared;
             };
    Nat: nat;
@@ -33,6 +33,10 @@ type CandyShared =
    Principal: principal;
    Set: vec CandyShared;
    Text: text;
+   ValueMap: vec record {
+                   CandyShared;
+                   CandyShared;
+                 };
  };
 type AddressedChunkArray = vec AddressedChunk;
 type AddressedChunk = 

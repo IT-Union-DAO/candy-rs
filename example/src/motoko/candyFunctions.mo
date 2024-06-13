@@ -1,7 +1,7 @@
 import Blob "mo:base/Blob";
 import Nat8 "mo:base/Nat8";
-import Prelude "mo:base/Prelude";
 import Principal "mo:base/Principal";
+import Text "mo:base/Text";
 import Conversion "mo:candy/conversion";
 import Json "mo:candy/json";
 import CandyTypes "mo:candy/types";
@@ -116,18 +116,24 @@ actor MotokoCanisterCandyTypes {
     };
 
     public query func getOptSome() : async CandyTypes.CandyShared {
-        #Option(?#Nat(15));
+        #Option(? #Nat(15));
     };
 
     public query func getCandyMap() : async CandyTypes.CandyShared {
-        let map = Map.new<CandyTypes.Candy, CandyTypes.Candy>();
-        let map2 = Map.put(map, CandyTypes.candyMapHashTool, #Nat(15), #Nat(15));
+        let map = Map.new<Text, CandyTypes.Candy>();
+        Map.set(map, Map.thash, "icp", #Nat(15));
         return CandyTypes.shareCandy(#Map(map));
+    };
+
+    public query func getCandyValueMap() : async CandyTypes.CandyShared {
+        let map = Map.new<CandyTypes.Candy, CandyTypes.Candy>();
+        let _ = Map.put(map, CandyTypes.candyMapHashTool, #Nat(15), #Nat(15));
+        return CandyTypes.shareCandy(#ValueMap(map));
     };
 
     public query func getCandySet() : async CandyTypes.CandyShared {
         let set = Set.new<CandyTypes.Candy>();
-        let set2 = Set.put(set, CandyTypes.candyMapHashTool, #Nat(15));
+        let _ = Set.put(set, CandyTypes.candyMapHashTool, #Nat(15));
         return CandyTypes.shareCandy(#Set(set));
     };
 
@@ -250,7 +256,7 @@ actor MotokoCanisterCandyTypes {
     };
 
     public query func candySomeToJson() : async Text {
-        Json.value_to_json(#Option(?#Nat(15)));
+        Json.value_to_json(#Option(? #Nat(15)));
     };
 
     //Nats
@@ -379,7 +385,7 @@ actor MotokoCanisterCandyTypes {
 
     //Option
     public query func sizeOfCandyOption() : async Nat {
-        Workspace.getCandySharedSize(#Option(?#Nat(15)));
+        Workspace.getCandySharedSize(#Option(? #Nat(15)));
     };
 
     //Option None
@@ -413,10 +419,10 @@ actor MotokoCanisterCandyTypes {
     };
 
     //Map
-    public query func sizeOfCandyMap() : async Nat {
+    public query func sizeOfCandyValueMap() : async Nat {
         let map = Map.new<CandyTypes.Candy, CandyTypes.Candy>();
         let map2 = Map.put(map, CandyTypes.candyMapHashTool, #Nat(15), #Nat(15));
-        return Workspace.getCandySharedSize(CandyTypes.shareCandy(#Map(map)));
+        return Workspace.getCandySharedSize(CandyTypes.shareCandy(#ValueMap(map)));
     };
 
     //Set

@@ -2,12 +2,11 @@ use std::collections::{HashMap, HashSet};
 
 use candid::candid_method;
 use candid::Principal;
-use ic_cdk_macros::{query, update};
+use ic_cdk_macros::query;
 
 use ic_candy::types::PropertyShared;
 use ic_candy::value::CandyShared;
 use ic_candy::value::ToCandyValue;
-use ic_candy::workspace::ChunkingType;
 
 //Int
 #[query]
@@ -48,7 +47,7 @@ pub fn size_of_candy_int64() -> u128 {
 #[query]
 #[candid_method(query)]
 pub fn size_of_candy_nat() -> u128 {
-    CandyShared::Nat(candid::Nat::from(1_234_567_890)).get_value_size()
+    CandyShared::Nat(candid::Nat::from(1_234_567_890_u128)).get_value_size()
 }
 
 //Nat8
@@ -123,7 +122,7 @@ pub fn size_of_candy_class() -> u128 {
             value: (-15_i128).to_candy(),
         },
     ])
-    .get_value_size()
+        .get_value_size()
 }
 
 //Principal
@@ -154,9 +153,9 @@ pub fn size_of_candy_option_none() -> u128 {
 pub fn size_of_candy_array() -> u128 {
     CandyShared::Array(vec![
         CandyShared::Int(candid::Int::from(-15)),
-        CandyShared::Nat(candid::Nat::from(15)),
+        CandyShared::Nat(candid::Nat::from(15_u8)),
     ])
-    .get_value_size()
+        .get_value_size()
 }
 
 //Bytes
