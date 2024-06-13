@@ -3,6 +3,8 @@
 /example/Cargo.lock
 /.idea/
 /example/.vessel/
+/example/.mops/
+/example/.env
 /example/.dfx/
 /example/target/
 /example/node_modules/

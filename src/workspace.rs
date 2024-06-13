@@ -27,7 +27,7 @@ pub type AddressedChunk = (u128, u128, CandyShared);
 pub type AddressedChunkArray = Vec<AddressedChunk>;
 
 /*
-Enumeration that specifies the type of chunk retrieved from workspace, which can be either Eof (for end-of-file) or Chunk (partial)
+E193numeration that specifies the type of chunk retrieved from workspace, which can be either Eof (for end-of-file) or Chunk (partial)
 */
 #[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
 pub enum ChunkingType {
@@ -130,7 +130,7 @@ impl DataZoneTrait for DataZone {
     /// 16_u128.to_candy(),
     /// Principal::from_text("aaaaa-aa").unwrap().to_candy()
     /// ];
-    /// assert_eq!(dz.get_data_zone_size(), 197);
+    /// assert_eq!(dz.get_data_zone_size(), 213);
     /// ```
     fn get_data_zone_size(&self) -> u128 {
         Encode!(self).unwrap().len() as u128

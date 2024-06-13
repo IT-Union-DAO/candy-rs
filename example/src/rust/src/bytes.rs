@@ -1,9 +1,9 @@
 use candid::candid_method;
 use candid::Principal;
+use ic_cdk_macros::query;
+
 use ic_candy::value::CandyShared;
 use ic_candy::value::ToCandyValue;
-use ic_candy::workspace::ChunkingType;
-use ic_cdk_macros::{query, update};
 
 #[query]
 #[candid_method(query)]
@@ -29,7 +29,7 @@ pub fn candy_text_to_blob() -> Vec<u8> {
 #[query]
 #[candid_method(query)]
 pub fn candy_nat_to_blob() -> Vec<u8> {
-    CandyShared::Nat(candid::Nat::from(1_234_567_890)).to_blob()
+    CandyShared::Nat(candid::Nat::from(1_234_567_890_u128)).to_blob()
 }
 
 //Int

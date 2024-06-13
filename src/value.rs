@@ -40,7 +40,8 @@ pub enum CandyShared {
     Array(Vec<CandyShared>),
     Nats(Vec<candid::Nat>),
     Floats(Vec<f64>),
-    Map(HashMap<CandyShared, CandyShared>),
+    Map(HashMap<String, CandyShared>),
+    ValueMap(HashMap<CandyShared, CandyShared>),
     Set(HashSet<CandyShared>),
 }
 
@@ -481,7 +482,7 @@ impl CandyShared {
     ///
     ///
     /// let dz : CandyShared = vec![0_u8;3_000_000].to_candy();
-    /// assert_eq!(dz.get_value_size(),3000196);
+    /// assert_eq!(dz.get_value_size(),3_000_210);
     /// ```
     pub fn get_value_size(&self) -> u128 {
         Encode!(self).unwrap().len() as u128
@@ -497,6 +498,27 @@ impl CandyShared {
         let mut trimmed = result.trim_end().to_string();
         trimmed.push(']');
         trimmed
+    }
+
+    fn are_maps_equal<T: Eq + Hash>(
+        map1: &HashMap<T, CandyShared>,
+        map2: &HashMap<T, CandyShared>,
+    ) -> bool {
+        if map1.len() != map2.len() {
+            false
+        } else {
+            for (key1, value1) in map1.iter() {
+                match map2.get(key1) {
+                    Some(value2) => {
+                        if !(value1 == value2) {
+                            return false;
+                        }
+                    }
+                    None => return false,
+                }
+            }
+            true
+        }
     }
 }
 
@@ -529,7 +551,8 @@ impl_from!(
     Principal => Principal ,
     Option<Box<CandyShared >> => Option,
     Vec<u8> => Blob,
-    HashMap<CandyShared,CandyShared> => Map,
+    HashMap<CandyShared,CandyShared> => ValueMap,
+    HashMap<String,CandyShared> => Map,
     HashSet<CandyShared> => Set
 );
 
@@ -620,6 +643,7 @@ pub trait ToCandyValue {
 macro_rules! to_candy {
     ($($t:ty),*) => {
         $(impl ToCandyValue for $t {
+          /// Converts the given value to a `CandyShared`.
             #[inline]
             fn to_candy(self) -> CandyShared {
                 CandyShared::from(self)
@@ -655,6 +679,7 @@ to_candy!(
     Vec<CandyShared>,
     &str,
     HashMap<CandyShared, CandyShared>,
+    HashMap<String, CandyShared>,
     HashSet<CandyShared>
 );
 
@@ -767,8 +792,14 @@ impl Hash for CandyShared {
                 }
                 buffer.hash(state)
             }
-            CandyShared::Map(i) => {
-                for (key, value) in i {
+            CandyShared::Map(map) => {
+                for (key, value) in map {
+                    key.hash(state);
+                    value.hash(state);
+                }
+            }
+            CandyShared::ValueMap(map) => {
+                for (key, value) in map {
                     key.hash(state);
                     value.hash(state);
                 }
@@ -807,22 +838,9 @@ impl PartialEq for CandyShared {
             (CandyShared::Nats(i1), CandyShared::Nats(i2)) => i1 == i2,
             (CandyShared::Ints(i1), CandyShared::Ints(i2)) => i1 == i2,
             (CandyShared::Floats(i1), CandyShared::Floats(i2)) => i1 == i2,
-            (CandyShared::Map(map1), CandyShared::Map(map2)) => {
-                if map1.len() != map2.len() {
-                    false
-                } else {
-                    for (key1, value1) in map1.iter() {
-                        match map2.get(key1) {
-                            Some(value2) => {
-                                if !(value1 == value2) {
-                                    return false;
-                                }
-                            }
-                            None => return false,
-                        }
-                    }
-                    true
-                }
+            (CandyShared::Map(map1), CandyShared::Map(map2)) => Self::are_maps_equal(map1, map2),
+            (CandyShared::ValueMap(map1), CandyShared::ValueMap(map2)) => {
+                Self::are_maps_equal(map1, map2)
             }
             (CandyShared::Set(set1), CandyShared::Set(set2)) => {
                 if set1.len() != set2.len() {
@@ -931,6 +949,7 @@ impl Display for CandyShared {
                 ret
             }),
             Self::Map(val) => write!(f, "{:?}", val),
+            Self::ValueMap(val) => write!(f, "{:?}", val),
             Self::Set(val) => write!(f, "{:?}", val),
         }
     }

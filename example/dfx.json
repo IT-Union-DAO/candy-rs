@@ -21,17 +21,15 @@
   },
   "networks": {
     "local": {
-      "bind": "127.0.0.1:8005",
+      "bind": "127.0.0.1:8007",
       "type": "ephemeral"
     }
   },
   "defaults": {
-    "replica": {
-      "subnet_type": "system"
-    },
     "build": {
-      "packtool": "vessel sources",
+      "packtool": "mops sources",
       "args": ""
     }
-  }
+  },
+  "output_env_file": ".env"
 }

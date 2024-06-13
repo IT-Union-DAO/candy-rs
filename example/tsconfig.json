@@ -58,7 +58,7 @@
       "dfx-type/*": [
         ".dfx/local/canisters/*.did.d.ts"
       ],
-      "dfx-gen/*":[
+      "dfx-gen/*": [
         "src/declarations/*"
       ]
     },

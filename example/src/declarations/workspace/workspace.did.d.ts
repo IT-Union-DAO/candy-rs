@@ -1,10 +1,11 @@
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export type AddressedChunk = [bigint, bigint, CandyShared];
 export type AddressedChunkArray = Array<AddressedChunk>;
 export type CandyShared = { 'Int' : bigint } |
-  { 'Map' : Array<[CandyShared, CandyShared]> } |
+  { 'Map' : Array<[string, CandyShared]> } |
   { 'Nat' : bigint } |
   { 'Set' : Array<CandyShared> } |
   { 'Nat16' : number } |
@@ -26,6 +27,7 @@ export type CandyShared = { 'Int' : bigint } |
   { 'Float' : number } |
   { 'Principal' : Principal } |
   { 'Array' : Array<CandyShared> } |
+  { 'ValueMap' : Array<[CandyShared, CandyShared]> } |
   { 'Class' : Array<PropertyShared> };
 export interface PropertyShared {
   'value' : CandyShared,
@@ -54,3 +56,5 @@ export interface _SERVICE {
     AddressedChunkArray
   >,
 }
+export declare const idlFactory: IDL.InterfaceFactory;
+export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];
